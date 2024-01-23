@@ -1,6 +1,6 @@
 # Microbial Omics Course (biol217) Protocol - Nils Groeters
 
-## Day 1: Introduction to Linux, Markdown, Git and Conda
+# Day 1: Introduction to Linux, Markdown, Git and Conda
 
 ### 1 Linux
 
@@ -16,21 +16,23 @@ What we have learned so far:
 cp source destination
 ```
 
-## Day 2: Introduction to Metagenomics, Amplicon Sequencing, Metagenomic Workflow
+# Day 2: Introduction to Metagenomics and Metagenomic Workflow
 
-### Cultivation-independent benefits of Metagenomics
+### Metagenomics
+
+Only a small percentage of the global microbial diversity can be cultured in the lab. In order to study microbes in their natural environment, metagenomic analysis can be used. By sequencing of the genomic DNA, plasmids or transcriptomes it is possible to investigate the microbial diversity.
 
 
 - Limitations: only proportions, not absolut values of microbes in the environment (see slide 16)
 
-### Amplicon Sequencing
+Amplicon Sequencing
 
 - 16S ribisome: 2 gene fused together, very conserved over many domains with conserved and "hyper-variable" regions, conserved regions can be targeted by primers to amplify the vaaible regions
 - merenlab.org/momics
 - Limitation: only known regions betwenn primers are amplified, mostly 16S RNA (missing plasmids, phages, eucaryotes)
 --> shotgun-metagenomic sequencing captures alle sequences
 
-### Metagenomic Workflow
+Metagenomic Workflow
 (slide 40, 41)
 
  Sequencing:
@@ -45,11 +47,36 @@ Assembly:
 - refernce-guided: known sequences from reference
 - de-novo: overlap or de Bruijn
 
-### Assembly of Short Read Sequences on the CAU Cluster
+## Assembly of Short Read Sequences on the CAU Cluster (Workflow)
 
-*Note: For every job the anvio-8 environment needs to be loaded by conda in the bash script.*
+Connect to the CAU cluster by ssh and change to the working directory:
 
-**1.** First task to run multiple raw read files with the **fastqc** program. This program analysis the short read sequences and visualizes the quality scores. The command is included inside the bash script, containing the job, and is handed in on the cau cluster.
+```bash
+ssh -X sunam230@caucluster.rz.uni-kiel.de
+
+cd $WORK
+```
+
+*Note: For every job a bash script needs to be submitted according to the CAU cluster documentation ([CAU-Cluster](https://www.hiperf.rz.uni-kiel.de/caucluster/)). In order to use the following prigrams the anvio-8 environment needs to be loaded by conda every time a new job is submitted.*
+
+### Program Documentations
+
+| Tool | Version | Repository |
+| --- | --- | --- |
+| fastqc | 0.12.1 | [FastQC](https://github.com/s-andrews/FastQC ) |
+| fastp | 0.23.4 | [fastp](https://github.com/OpenGene/fastp ) |
+| megahit | 1.2.9 | [megahit](https://github.com/voutcn/megahit ) |
+| samtools | 1.19 | [samtools](https://github.com/samtools/samtools ) |
+| QUAST | 5.2.0 | [quast](https://quast.sourceforge.net/quast ) |
+| Bowtie2 | 2.4.5 | [bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml ) |
+| binsanity | 0.5.3 | [binsanity](https://github.com/edgraham/BinSanity) |
+| MetaBAT2 | 2.12.1 | [Metabat2](https://bitbucket.org/berkeleylab/metabat/src/master/ ) |
+| DASTool | 1.1.5 | [DAS_Tool](https://github.com/cmks/DAS_Tool ) |
+| anvi´o | 8 | [anvi’o](https://anvio.org/ ) |
+| GUNC | 1.0.5 | [GUNC](https://grp-bork.embl-community.io/gunc/ ) |
+
+
+**1.** First task is to run multiple raw read files with the **fastqc** program. This program analysis the short read sequences and visualizes the quality scores. The command is included inside the bash script, containing the job, and is handed in on the cau cluster.
 
 Open a bash script file with the emacs editor:
 
