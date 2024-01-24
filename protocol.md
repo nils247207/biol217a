@@ -46,6 +46,7 @@ Assembly:
 
 - refernce-guided: known sequences from reference
 - de-novo: overlap or de Bruijn
+- k-mer: nr of nucleotides looked at at once
 
 ## Assembly of Short Read Sequences on the CAU Cluster (Workflow)
 
@@ -162,3 +163,51 @@ fastp -i [R1 FILE] -I [R2 FILE] -o [CLEANED R1 FILE] -O [CLEANED R2 FILE] -t -q
 megahit -1 [R1 FILE] -1 [R1 FILE] -1 [R1 FILE] -2 [R2 FILE] -2 [R2 FILE] -2 [R2 FILE] --min-contig-len 1000 --presets meta-large -m 0.85 -o [OUTPUT FOLDER] -t 12        
 ```
 
+# Day 3: From Contigs to Bins (Binning)
+
+- Contigs: proportion of contigs do not mirror reality, inrormation from sequncing data needed
+- k-mer of 4 best for computing
+- sequnce composition into MAGs ???
+- back mapping of all short reads to the reulting contig (by fastp) gives different coverages, usually ca 7 --> all contigs from one species should have similiar coverage
+- Binning on slide 143 (basis GC-content, kmer composition, covarage for most programs)
+
+- quality control (QC) of MAGs: marker genes (SCGs), genomic characteristics on slide 146
+- 16S RNA data hard to resolve in MAGs
+- Minimum information about MAG standards (MIMAG) to compare MAG qualities
+- MAG: collection of many strains (NOT a single strain!!) 
+- SNP analysis in the coverage: same SNPs are hint for same strain, different indicate strain divergence
+- slide 151: fragmentation can be indicated by high number of contigs needed for one MAG
+- 
+
+## Workflow Quality Assessment of Assemblies
+
+**1.** Count number of contigs in the assembly file:
+```bash
+grep -c ">" final.contigs.fa
+```
+**2.** Creating -fastg file for later visualization with **Bandage**:
+
+```bash
+megahit_toolkit contig2fastg 99 final.contigs.fa > final.contigs.fastg
+```
+Afterwards download the .fastg file to the local PC for visualization:
+
+```bash
+#ON A LOCAL TERMINAL
+scp sunam230@caucluster.rz.uni-kiel.de:/work_beegfs/sunam230/...
+```
+
+**3.** Quality Assessment of Assemblies with **metaquast**:
+
+```bash
+metaquast -t 6 -o /PATH/TO/3_metaquast -m 1000 final.contigs.fa
+
+# -t specifies the number of threads
+# -m specifies the lower contig threshhold
+```
+
+N50:
+L50:
+
+
+## Workflow Genome Binning
