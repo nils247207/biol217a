@@ -260,7 +260,8 @@ do samtools view -bS $i > "$i".bam; done
 anvi-gen-contigs-database -f contigs.anvio.fa -o contigs.db -n 'biol217'
 ```
 
-**2.** HMM search on the contigs:
+**2.** Hidden markov model search on contigs. HMM searches for known patterns from databases:
+
 ```shell script
 #!/bin/bash
 #SBATCH --nodes=1
