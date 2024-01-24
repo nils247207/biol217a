@@ -218,3 +218,40 @@ L50:
 anvi-script-reformat-fasta final.contigs.fa -o contigs.anvio.fa --min-len 1000 --simplify-names --report-file name_conversion.txt
 ```
 **2.** Mapping of the cleaned raw reads (.fasta.gz files) to the reformated contig (.anvio.fa):
+
+```shell script
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=10G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=mapping2
+#SBATCH --output=mapping2.out
+#SBATCH --error=mapping2.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+module load bowtie2
+
+cd /work_beegfs/sunam230/Metagenomics/2_fastp
+for i in `ls *_R1.fastq.gz`;
+
+
+# ??DOES LOOP WORK??
+do
+    second=`echo ${i} | sed 's/_R1/_R2/g'`
+    bowtie2 --very-fast -x ../3_coassembly/contigs.anvio.fa.index -1 ${i} -2 ${second} -S ../4_mapping/"$i".sam
+done
+```
+
+**bowtie2** produces a .sam file, which holds the coverage for ech contig sequence. These files are very big and need to be converted into binary alignment and map file (.bam) by **samtools**:
+
+```shell script
+module load samtools
+samtools view -bS ? > bam_file.bam
+```
+

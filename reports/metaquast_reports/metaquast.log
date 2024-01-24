@@ -1,0 +1,27 @@
+/zfshome/sunam230/.conda/envs/anvio-8/opt/quast-5.2.0/metaquast.py -t 6 -o ../3_metaquast_out -m 1000 final.contigs.fa
+
+Version: 5.2.0
+
+System information:
+  OS: Linux-4.18.0-372.9.1.el8.x86_64-x86_64-with-glibc2.28 (linux_64)
+  Python version: 3.10.13
+  CPUs number: 32
+
+Started: 2024-01-24 11:10:50
+
+Logging to /work_beegfs/sunam230/Metagenomics/3_metaquast_out/metaquast.log
+
+Contigs:
+  Pre-processing...
+  final.contigs.fa ==> final.contigs
+
+No references are provided, starting to search for reference genomes in SILVA 16S rRNA database and to download them from NCBI...
+
+2024-01-24 11:12:21
+
+Downloading SILVA 16S ribosomal RNA gene database (version 138.1)...
+
+ERROR! Failed downloading SILVA 16S rRNA gene database (http://www.arb-silva.de/fileadmin/silva_databases/release_138.1/Exports/SILVA_138.1_SSURef_NR99_tax_silva.fasta.gz)! The search for reference genomes cannot be performed. Try to download it manually, put under /zfshome/sunam230/.conda/envs/anvio-8/lib/python3.10/site-packages/quast_libs/silva/ and restart your command.
+Reference genomes are not found.
+
+NOTICE: No references are provided, starting regular QUAST with MetaGeneMark gene finder
