@@ -206,8 +206,15 @@ metaquast -t 6 -o /PATH/TO/3_metaquast -m 1000 final.contigs.fa
 # -m specifies the lower contig threshhold
 ```
 
-N50:
+N50: half the length of the longest assembled contig
+
 L50:
 
 
 ## Workflow Genome Binning
+
+**1.** Making the final contig file .fa compatible with anvi for mapping and binning later on:
+```bash
+anvi-script-reformat-fasta final.contigs.fa -o contigs.anvio.fa --min-len 1000 --simplify-names --report-file name_conversion.txt
+```
+**2.** Mapping of the cleaned raw reads (.fasta.gz files) to the reformated contig (.anvio.fa):
