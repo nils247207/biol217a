@@ -390,9 +390,29 @@ nvi-cluster-contigs -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -
 anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -o SUMMARY_MAXBIN2 -C MAXBIN2
 ```
 
+QUESTIONS: How many Archaea bins did we get from MetaBAT2 and Maxbin2?
+
+- MetaBat2 (3) only one Archaea with high completion percentage
+- Maxbin2 (2)
+
+Visual summary of bins from the different binners by:
+
+```bash
+#FRONT END TERMINAL
+
+anvi-estimate-genome-completeness -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db --list-collections
+#or -C [NAME OF BINNER]
+```
+
+Interactive summary of bins:
+
+```bash
+#FRONT END TERMINAL
+
+anvi-interactive -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C METABAT
 
 
-*LAST STEPS MISSING*
+```
 
 
 # Day 4:
