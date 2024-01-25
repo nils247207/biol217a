@@ -325,7 +325,7 @@ for i in *.bam; do anvi-init-bam $i -o "$i".sorted.bam; done
 
 **2.** Genome binning by **anvi´o**. The contigs will be grouped and assigned to individuel genomes. **anvi´o** uses binners like Metabat2 and binsanity in the background:
 
-- creating an anvi´o profile from .sorted.bam and .contig.db:
+- creating an anvi´o profile from .sorted.bam and .contig.db (only precesses contigs longer than 2500nts):
 ```bash
 #!/bin/bash
 #SBATCH --nodes=1
@@ -346,12 +346,51 @@ cd /work_beegfs/sunam230/Metagenomics/4_mapping
 mkdir profiling_output
 for i in `ls *.sorted.bam | cut -d "." -f 1`; do anvi-profile -i "$i".bam.sorted.bam -c ../3_coassembly/contigs.db -o ./profiling_output”$i”; done
 ```
+The output folder contains the RUUNNLOG.txt and the PROFILE.db with key information about mappings from short reads to the contigs.
  
 - merging profiles from different samples into one profile:
 
 ```bash
 anvi-merge /PATH/TO/SAMPLE1/PROFILE.db /PATH/TO/SAMPLE2/PROFILE.db /PATH/TO/SAMPLE3/PROFILE.db -o /PATH/TO/merged_profiles -c /PATH/TO/contigs.db --enforce-hierarchical-clustering
 ```
+- BINNING with two different binners (to avoid contamination in MAGs by refining different binning results), **Metabat2** and **MaxBin2**:
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=6
+#SBATCH --mem=10G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=binning-metabat2
+#SBATCH --output=binning-metabat2.out
+#SBATCH --error=binning-metabat2.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+cd /work_beegfs/sunam230/Metagenomics/5_anvio_profiles/profiling_output
+anvi-cluster-contigs -p ./merged_profiles/PROFILE.db -c ../../3_coassembly/contigs.db -C METABAT --driver metabat2 --just-do-it --log-file log-metabat2
+anvi-summarize -p ./merged_profiles/PROFILE.db -c ../../3_coassembly/contigs.db -o SUMMARY_METABAT -C METABAT
+
+```
+and 
+
+```bash
+#SBATCH script ...
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+cd /work_beegfs/sunam230/Metagenomics/CC/5_anvio_profiles
+nvi-cluster-contigs -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C MAXBIN2 --driver maxbin2 --just-do-it --log-file log-maxbin2
+
+anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -o SUMMARY_MAXBIN2 -C MAXBIN2
+```
+
+
 
 *LAST STEPS MISSING*
 
