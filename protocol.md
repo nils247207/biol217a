@@ -281,3 +281,33 @@ conda activate anvio-8
 cd /work_beegfs/sunam230/Metagenomics/3_coassembly
 anvi-run-hmms -c contigs.db
 ```
+
+**3.** Assigning the terminal to a node on the CAU cluster (the front end is not suitable for running anvi´o interactive):
+```shell script
+# DIRECTLY IN THE TERMINAL:
+srun --reservation=biol217 --pty --mem=10G --nodes=1 --tasks-per-node=1 --cpus-per-task=1 --nodelist=n100 /bin/bash
+```
+Afterwards the user runs directly on the specified node:
+
+```
+ [sunam230@n100 nilsg]$ 
+ ```
+
+And the condo environment has to be loaded again on this node in order to run **anvi-display-contigs-status**:
+
+```shell script
+# DIRECTLY IN THE TERMINAL on the computing node
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+anvi-display-contigs-stats contigs.db
+```
+In a new terminal we login into the node by ssh:
+
+```shell script
+ssh -L 8060:localhost:8080 sunam###@caucluster.rz.uni-kiel.de
+ssh -L 8080:localhost:8080 n###
+```
+The link http://127.0.0.1:8060 or http://127.0.0.1:8080 can be opened in the browser om the local PC! The program shows the stats of the database file (.db).
