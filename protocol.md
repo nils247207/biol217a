@@ -310,4 +310,60 @@ In a new terminal we login into the node by ssh:
 ssh -L 8060:localhost:8080 sunam###@caucluster.rz.uni-kiel.de
 ssh -L 8080:localhost:8080 n###
 ```
-The link http://127.0.0.1:8060 or http://127.0.0.1:8080 can be opened in the browser om the local PC! The program shows the stats of the database file (.db).
+The link http://127.0.0.1:8060 or http://127.0.0.1:8080 can be opened in the browser om the local PC! The program shows the stats of the database file (.db):
+
+[Database report](./reports/contig_database/Contigs%20DB%20Stats.pdf)
+
+## Workflow Binning with ANVI´O
+
+**1.** Sorting and indexing of mapping files (.bam) with **anvi-init-bam**. This uses **samtools** in the background:
+
+```bash
+#bash script
+for i in *.bam; do anvi-init-bam $i -o "$i".sorted.bam; done
+```
+
+**2.** Genome binning by **anvi´o**. The contigs will be grouped and assigned to individuel genomes. **anvi´o** uses binners like Metabat2 and binsanity in the background:
+
+- creating an anvi´o profile from .sorted.bam and .contig.db:
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=16G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=anvi-profile
+#SBATCH --output=anvi-profile.out
+#SBATCH --error=anvi-profile.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+cd /work_beegfs/sunam230/Metagenomics/4_mapping
+mkdir profiling_output
+for i in `ls *.sorted.bam | cut -d "." -f 1`; do anvi-profile -i "$i".bam.sorted.bam -c ../3_coassembly/contigs.db -o ./profiling_output”$i”; done
+```
+ 
+- merging profiles from different samples into one profile:
+
+```bash
+anvi-merge /PATH/TO/SAMPLE1/PROFILE.db /PATH/TO/SAMPLE2/PROFILE.db /PATH/TO/SAMPLE3/PROFILE.db -o /PATH/TO/merged_profiles -c /PATH/TO/contigs.db --enforce-hierarchical-clustering
+```
+
+*LAST STEPS MISSING*
+
+
+# Day 4:
+
+Lecture: 
+
+- Contamination in MAGs (MAG is a group of genomes from several species!!): by different genomes in one bin
+- solution: run different binners, compared in a bin REFINER
+- solution: reuse (all reads an not just high abundance reads used in mapping) raw reads for mapping on original bins, which can give more information on the overlapping of contigs in one bin, ...
+- chimera detection in MAGs: GUNC scoring (can resolve non-redundant combination of genes from different taxa in one bin) of CSS (based on taxonomic diversity in one contig compared to the other contiigs diversities): high RRS gives confidence based on reference database
+
+- MAG taxonomy (slide 173)
+- 
