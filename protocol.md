@@ -511,7 +511,15 @@ module load miniconda3/4.12.0
 conda activate anvio-8
 anvi-refine -c ../4_mapping/contigs.db -C METABAT -p ./merged_profiles/PROFILE.db --bin-id Bin_METABAT__39
 ```
+
+The contigs included in this MAG are shown for all different samples (BGR)
+
 ![anvio-interactive-manual-fefinemt-METABAT_39](./images/anvio-interactive-manual-refiement-METABAT_39.png)
+
+
+Different GC content is a first indicator for the integration of wrong genomes into the bin. Also the ebove
+
+*questions from script...*
 
 
 
