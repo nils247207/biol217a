@@ -358,7 +358,7 @@ The output folder contains the RUUNNLOG.txt and the PROFILE.db with key informat
 ```bash
 anvi-merge /PATH/TO/SAMPLE1/PROFILE.db /PATH/TO/SAMPLE2/PROFILE.db /PATH/TO/SAMPLE3/PROFILE.db -o /PATH/TO/merged_profiles -c /PATH/TO/contigs.db --enforce-hierarchical-clustering
 ```
-- BINNING with two different binners (to avoid contamination in MAGs by refining different binning results), **Metabat2** and **MaxBin2**:
+- BINNING with two different binners (to avoid contamination in MAGs by refining different binning results), **Metabat2** and **Binsanity**:
 ```bash
 #!/bin/bash
 #SBATCH --nodes=1
@@ -390,15 +390,15 @@ module load miniconda3/4.12.0
 conda activate anvio-8
 
 cd /work_beegfs/sunam230/Metagenomics/CC/5_anvio_profiles
-nvi-cluster-contigs -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C MAXBIN2 --driver maxbin2 --just-do-it --log-file log-maxbin2
+nvi-cluster-contigs -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C BINSANITY --driver binsanity --just-do-it --log-file log-binsanity
 
-anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -o SUMMARY_MAXBIN2 -C MAXBIN2
+anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -o SUMMARY_BINSANITY -C BINSANITY
 ```
 
 QUESTIONS: How many Archaea bins did we get from MetaBAT2 and Maxbin2?
 
 - MetaBat2 (3) only one Archaea with high completion percentage
-- Maxbin2 (2)
+- Binsanity (2)
 
 Visual summary of bins from the different binners by:
 
@@ -417,13 +417,13 @@ Interactive summary of bins:
 anvi-interactive -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C METABAT
 ```
 
-METABAT result:
+METABAT result contains 48 bins:
 
 ![METABAT_interactive_bin](./images/METABAT_interactive_bin.png)
 
-MAXBIN result:
+BINSANITY result contains 150 bins:
 
-![MAXBIN_interactive_bin](./images/)
+![MAXBIN_interactive_bin](./images/BINSANITY_interactive_bin.png)
 
 
 # Day 4:
@@ -462,5 +462,56 @@ Lecture:
 - abundance comparison between samples of the same environment possible by coverage values (ONLY RELATIVE VALUES): read recruitment (is there a best sequencing technique for comparible coverage values??)
 - contigs/reads not used for final MAG binning: information used for profiling afterwards --> taxonomy slide 258 ff. Lowest common ancestor which shares a givin sequence- What other organisms might be present in a sample and could not be included in a MAG
 - 
+
+## Workflow Bin Refinement (only Archaea)
+
+**1.** Identifieng the Archaea strain bins from the binning results respectively. Then copy the single bin directories into an extra directory with all bins selected for refinement.
+
+**2.** Detection of chimerism and contamination by **GUNC**, which might result from mis-binning of genomic contigs from unrelated lineages. Therefore the output from seperate binners are used (in this script a different node and high memory is used for faster computation):
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=gunc
+#SBATCH --output=gunc.out
+#SBATCH --error=gunc.err
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=2000G
+#SBATCH --partition=highmem
+#SBATCH --qos=long
+#SBATCH --time=10-00:00:00
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate gunc
+
+cd /work_beegfs/sunam230/Metagenomics/CC/5_anvio_profiles/ARCHAEA_BIN_REFINEMENT
+
+mkdir GUNC
+
+for i in *.fa; do gunc run -i "$i" -r /work_beegfs/sunam230/Databases/gunc_db_progenomes2.1.dmnd --out_dir GUNC/"$i" --threads 10 --detailed_output; done
+```
+
+```bash
+#ONLY ONE BIN COULD BE VISUALIZED DO TO OVERWRITING OF gunc plot
+gunc plot -d ./diamond_output/METABAT__39-contigs.diamond.progenomes_2.1.out -g ./gene_calls/gene_counts.json
+```
+
+Example visualization of a Archaeau METABAT bin:
+![GUNC_refined_bin_Archaea_METABAT_39](./images/GUNC_visual_METABAT_bin_39_archaea.png)
+
+**3.** Manual bin refinement with **anvi-refine**. The unrefinded bin will be OVERWRITTEN by this program, so the unrefindes bin need du be copied as backup. Then:
+
+```bash
+#TERMINAL
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+anvi-refine -c ../4_mapping/contigs.db -C METABAT -p ./merged_profiles/PROFILE.db --bin-id Bin_METABAT__39
+```
+![anvio-interactive-manual-fefinemt-METABAT_39](./images/anvio-interactive-manual-refiement-METABAT_39.png)
+
 
 
