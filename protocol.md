@@ -420,9 +420,36 @@ anvi-interactive -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C M
 Lecture: 
 
 - Contamination in MAGs (MAG is a group of genomes from several species!!): by different genomes in one bin
+- **single copy marker genes???** 
 - solution: run different binners, compared in a bin REFINER
 - solution: reuse (all reads an not just high abundance reads used in mapping) raw reads for mapping on original bins, which can give more information on the overlapping of contigs in one bin, ...
 - chimera detection in MAGs: GUNC scoring (can resolve non-redundant combination of genes from different taxa in one bin) of CSS (based on taxonomic diversity in one contig compared to the other contiigs diversities): high RRS gives confidence based on reference database
+- **completeness and contamination** (quality measures are completness % values)
+
+- bin refinment: chimera detection (gene information compared to database), multiple binning, use raw reads and infos from .fastq
 
 - MAG taxonomy (slide 173)
+
+
+
+# Day 5:
+
+Lecture:
+
+- repition to integrated artifacts (virus, etc) : different nucleotide composition (e.g. GC content, tetranucleotide frequency)
+- shotgun sequencing: 
+#### TAXONOMY: (slide to present day approaches) 
+- Phylogenomics uses howl genome datasets
+- limitations if only based on 1 gene (eg 16S rRNA)
+- Genome Taxonomy DataBase (average nucleotide identity and evolutionary divergence) holds many genomes, which are not cultivated. BUT lot of work to be done to avaluate MAG based data further
+- ANI on slides: Alignment Fraction shows if there is still unshared sequences, even if the overlapping region has a high average coverage (also the alignment has to be hight together with the nucleotide identity) SCORE: >70% alignment fraction, >95% ANI are strong identifiers for two genomes belonging to the same species
+- GTDB taxonomy assignemt output on slide 190, some species must be assigned even though they cannot be cultivated, different names between databases possible
+- other databases: son slide ~195, JSpeciesW for comparison bewteen databases?
+
+#### MAG 
+- dereplication on slide 198
+- abundance comparison between samples of the same environment possible by coverage values (ONLY RELATIVE VALUES): read recruitment (is there a best sequencing technique for comparible coverage values??)
+- contigs/reads not used for final MAG binning: information used for profiling afterwards --> taxonomy slide 258 ff. Lowest common ancestor which shares a givin sequence- What other organisms might be present in a sample and could not be included in a MAG
 - 
+
+
