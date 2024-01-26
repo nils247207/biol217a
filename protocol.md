@@ -419,11 +419,11 @@ anvi-interactive -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C M
 
 METABAT result contains 48 bins:
 
-![METABAT_interactive_bin](./images/METABAT_interactive_bin.png)
+![METABAT_interactive_bin](./images/metagenomics/METABAT_interactive_bin.png)
 
 BINSANITY result contains 150 bins:
 
-![MAXBIN_interactive_bin](./images/BINSANITY_interactive_bin.png)
+![MAXBIN_interactive_bin](./images/metagenomics/BINSANITY_interactive_bin.png)
 
 
 # Day 4:
@@ -514,12 +514,10 @@ anvi-refine -c ../4_mapping/contigs.db -C METABAT -p ./merged_profiles/PROFILE.d
 
 The contigs included in this MAG are shown for all different samples (BGR)
 
-![anvio-interactive-manual-fefinemt-METABAT_39](./images/anvio-interactive-manual-refiement-METABAT_39.png)
+![anvio-interactive-manual-fefinemt-METABAT_39](./images/metagenomics/anvio-interactive-manual-refiement-METABAT_39.png)
 
 
 Different GC content is a first indicator for the integration of wrong genomes into the bin. Also the ebove
 
 *questions from script...*
-
-
 
