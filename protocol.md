@@ -117,6 +117,11 @@ Tracking the job on the cluster:
  squeue -u [USERNAME]
  ```
 
+
+ Quality information from fastqc:
+
+ ![fastqc_report](./images/fastqc_report.png)
+
 **2.** The next task is to run the **fastp** program in order to clean up the raw read files. This is done in pairs (R1/R2), which result from the sequencing method in both directions. **fastp** can not run in a loop over multiple files and has to be executed seperatly for each file pair. The information on the quality of the reads (obtained from **fastqc**) is used for the following setting.
 
 Command line for fastp:
@@ -410,9 +415,15 @@ Interactive summary of bins:
 #FRONT END TERMINAL
 
 anvi-interactive -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db -C METABAT
-
-
 ```
+
+METABAT result:
+
+![METABAT_interactive_bin](./images/METABAT_interactive_bin.png)
+
+MAXBIN result:
+
+![MAXBIN_interactive_bin](./images/)
 
 
 # Day 4:
