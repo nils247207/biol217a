@@ -18,6 +18,8 @@ cp source destination
 
 # Day 2: Introduction to Metagenomics and Metagenomic Workflow
 
+*[Overview Workflow](./MAG_workflow.pdf)*
+
 ### Metagenomics
 
 Only a small percentage of the global microbial diversity can be cultured in the lab. In order to study microbes in their natural environment, metagenomic analysis can be used. By sequencing of the genomic DNA, plasmids or transcriptomes it is possible to investigate the microbial diversity.
