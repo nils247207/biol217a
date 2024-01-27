@@ -8,5 +8,4 @@ Protocol progress:
 - Day 5 lecture notes, questions!! Bin quality check: CSS score inicates chimeras on different taxonomic levels (GUNC) output
 
 ## TODo
-- single copy marker genes, what for at binning?
-- saturday: formulate notes in protocol, day 5 script, report layout
+- saturday: formulate notes in protocol

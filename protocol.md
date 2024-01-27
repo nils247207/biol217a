@@ -557,4 +557,10 @@ conda activate anvio-8
 cd /work_beegfs/sunam230/Metagenomics/5_anvio_profiles
 
 anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db --metagenome-mode -o ./SUMMARY_METABAT2 -C METABAT2
+
+#?? metagenome mode not working??
 ```
+
+
+## Workflow Genome Dereplication
+
