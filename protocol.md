@@ -96,7 +96,7 @@ emacs [filename] &
 #SBATCH --job-name=fastqc
 #SBATCH --output=fastqc.out
 #SBATCH --error=fastqc.err
-#SBATCH --partition=all
+#SBATCH --partition=base
 #SBATCH --reservation=biol217
 
 module load gcc12-env/12.1.0
@@ -523,3 +523,38 @@ Different GC content is a first indicator for the integration of wrong genomes i
 
 *questions from script...*
 
+## Workflow Taxonomic Assignement
+
+Adding taxonomic annotations to MAGs by **anvi scg-taxonomy**. This program associates single-copy core genes in the contigs.db with taxonomy information from GTDB databases (no viral or eukaryotic genomes up to now). Next taxonomy estimates of the metagenome is done, to see relative abundances of single-copy core genes:
+
+```bash
+#BASH SCRIPT
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+cd /work_beegfs/sunam230/Metagenomics/4_mapping
+
+#annotation
+anvi-run-scg-taxonomy -c contigs.db -T 20 -P 2
+
+#estimation
+anvi-estimate-scg-taxonomy -c contigs.db -p ../5_anvio_profiles/merged_profiles/PROFILE.db --metagenome-mode --compute-scg-coverages --update-profile-db-with-taxonomy -o TAXONOMY.txt
+```
+
+Output from anvi-run-scg-taxonomy shows the found single-copy marker genes:
+![anvi-run-scg-taxonomy](./images/metagenomics/anvi-run-scg-taxonomy-output.png)
+
+Final summary of comprehensive info about the METABAT2 bins by **anvi-summerize**:
+```bash
+#BASH SCRIPT
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+cd /work_beegfs/sunam230/Metagenomics/5_anvio_profiles
+
+anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db --metagenome-mode -o ./SUMMARY_METABAT2 -C METABAT2
+```
