@@ -9,4 +9,4 @@ Protocol progress:
 
 ## TODo
 - single copy marker genes, what for at binning?
-- 
+- saturday: formulate notes in protocol, day 5 script, report layout
