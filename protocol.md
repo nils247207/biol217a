@@ -122,7 +122,7 @@ Tracking the job on the cluster:
 
  Quality information from fastqc:
 
- ![fastqc_report](./images/fastqc_report.png)
+ ![fastqc_report](./images/metagenomics/fastqc_report.png)
 
 **2.** The next task is to run the **fastp** program in order to clean up the raw read files. This is done in pairs (R1/R2), which result from the sequencing method in both directions. **fastp** can not run in a loop over multiple files and has to be executed seperatly for each file pair. The information on the quality of the reads (obtained from **fastqc**) is used for the following setting.
 
