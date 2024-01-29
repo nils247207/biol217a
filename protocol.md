@@ -595,7 +595,9 @@ short reads: gaps possible
 
 **1.**
 - hybrid assembly of short and long reads combined. for that we use absolute paths to files $WORK/genomics/.../
+- short reads give first assembly and long reads can be used to tackle missing gaps
 - create a new folder for all new outputs and sorting of data, numbers in front for later data pipeline
+
 - activate 01_short_reads_qc micromamaba environment:
 ```bash
 module load gcc12-env/12.1.0
@@ -720,3 +722,40 @@ before: 15963 after: 12446
 
 Did the quality of the reads improve after trimming?
 mean quality: 11.4
+
+
+
+**3.** Hybrid assembly out of short AND long reads: 
+
+
+****     entire pipeline         ****
+
+**** links to programs in script ****
+
+- **Unicycler** for assembly (maximal nr of threads correspond to used cpus) of long and short from the SAME sample
+- **Quast, CheckM, CheckM2** Quast uses busco database, for quality control of assembly (quality matrices), output in .csv files (contamination: bp not belonging to an an assembly, best: low nr of contigs), N50 = 1 means over 50% of genome is in a single contig, CheckM2 is state of the arts AI prediction
+- annotation data in .gff file by **Prokka**: rapid for prokaryotes, visualization in **Integrated Genome Browser**
+- classification (naming) of genomes in .tsv file by **GTDB** (database) takes a lot of ram, taxonomy information and reference genome shown in summary of species with highest ANI value
+- finally **multiqc** to connect all reports from the entire pipeline
+- **Bandage** on local PC, shows contigs in different colors. identification of contaminations (less than 1kb contig need to be realuvated or deleted from fasta file), shows different contigs (tiny contigs can be removed)
+- classification compares whole genomes and taxonomy (in comparison to annotation only)
+
+[MULTIQC REPORT](./reports/genomics/multiqc_report.html)
+
+*QUESTIONS:*
+
+- How good is the quality of genome?
+
+CheckM completeness of 98.88%, Contamination of 0.19%, QUAST shows 7 contigs (4 are <1000bp) and L50 = 1
+--> good quality
+
+- Why did we use hybrid assembler?
+long reads are used to fill up gaps and account for errors that might occure by the assembly of the cleaned short read sequences
+
+- What is the difference between short and long reads?
+
+
+- Did we use Single or Paired end reads? Why?
+
+
+- Write down about the classification of genome we have used here
