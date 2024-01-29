@@ -79,9 +79,11 @@ cd $WORK
 | GUNC | 1.0.5 | [GUNC](https://grp-bork.embl-community.io/gunc/ ) |
 
 
-**1.** First task is to run multiple raw read files with the **fastqc** program. This program analysis the short read sequences and visualizes the quality scores. The command is included inside the bash script, containing the job, and is handed in on the cau cluster.
+### 1. Quality control of short raw reads by **fastqc**: 
 
-Open a bash script file with the emacs editor:
+- This program analysis the short read sequences and visualizes the quality scores. The command is included inside the bash script, containing the job, and is handed in on the cau cluster.
+
+Create a new bash script file (.sh):
 
 ```bash
 emacs [filename] &
@@ -124,9 +126,10 @@ Tracking the job on the cluster:
 
  ![fastqc_report](./images/metagenomics/fastqc_report.png)
 
-**2.** The next task is to run the **fastp** program in order to clean up the raw read files. This is done in pairs (R1/R2), which result from the sequencing method in both directions. **fastp** can not run in a loop over multiple files and has to be executed seperatly for each file pair. The information on the quality of the reads (obtained from **fastqc**) is used for the following setting.
+### 2. Cleaning/Trimming of raw reads by **fastp**: 
 
-Command line for fastp:
+- This is done in pairs (R1/R2), which result from the sequencing method in both directions (pairwise). **fastp** can not run in a loop over multiple files and has to be executed seperatly for each file pair. The information on the quality of the reads (obtained from **fastqc**) is used for the following setting.
+
 ```
 fastp -i ? -I ? -R ? -o ? -O ? -t 6 -q 20
 
@@ -164,7 +167,9 @@ fastp -i [R1 FILE] -I [R2 FILE] -o [CLEANED R1 FILE] -O [CLEANED R2 FILE] -t -q
 ...
 ```
 
-**3.** The assembly of the cleaned reads is done by **megahit**. The program takes in all R1 and R2 short read pairs and the output is directed to one folder:
+### 3. Assembly of the cleaned reads by **megahit**: 
+
+- The program takes in all R1 and R2 short read pairs and the output is directed to one folder.
 
 ```bash
 megahit -1 [R1 FILE] -1 [R1 FILE] -1 [R1 FILE] -2 [R2 FILE] -2 [R2 FILE] -2 [R2 FILE] --min-contig-len 1000 --presets meta-large -m 0.85 -o [OUTPUT FOLDER] -t 12        
@@ -188,11 +193,11 @@ megahit -1 [R1 FILE] -1 [R1 FILE] -1 [R1 FILE] -2 [R2 FILE] -2 [R2 FILE] -2 [R2 
 
 ## Workflow Quality Assessment of Assemblies
 
-**1.** Count number of contigs in the assembly file:
+### 1. Count number of contigs in the assembly file:
 ```bash
 grep -c ">" final.contigs.fa
 ```
-**2.** Creating -fastg file for later visualization with **Bandage**:
+### 2. Creating -fastg file for later visualization with **Bandage**:
 
 ```bash
 megahit_toolkit contig2fastg 99 final.contigs.fa > final.contigs.fastg
@@ -204,7 +209,7 @@ Afterwards download the .fastg file to the local PC for visualization:
 scp sunam230@caucluster.rz.uni-kiel.de:/work_beegfs/sunam230/...
 ```
 
-**3.** Quality Assessment of Assemblies with **metaquast**:
+### 3. Quality Assessment of Assemblies with **metaquast**:
 
 ```bash
 metaquast -t 6 -o /PATH/TO/3_metaquast -m 1000 final.contigs.fa
@@ -220,11 +225,11 @@ L50:
 
 ## Workflow Genome Binning
 
-**1.** Making the final contig file .fa compatible with anvi for mapping and binning later on:
+### 1. Making the final contig file .fa compatible with anvi for mapping and binning later on:
 ```bash
 anvi-script-reformat-fasta final.contigs.fa -o contigs.anvio.fa --min-len 1000 --simplify-names --report-file name_conversion.txt
 ```
-**2.** Mapping of the cleaned raw reads (.fasta.gz files) to the reformated contig (.anvio.fa):
+### 2. Mapping of the cleaned raw reads (.fasta.gz files) to the reformated contig (.anvio.fa):
 
 ```shell script
 #!/bin/bash
@@ -262,12 +267,12 @@ do samtools view -bS $i > "$i".bam; done
 ```
 ## Workflow Contigs Data Preparation (anvio)
 
-**1.** Convert the .fa file (contigs) into .db file by **anvi-gen-contigs-database**:
+### 1. Convert the .fa file (contigs) into .db file by **anvi-gen-contigs-database**:
 ```shell script
 anvi-gen-contigs-database -f contigs.anvio.fa -o contigs.db -n 'biol217'
 ```
 
-**2.** Hidden markov model search on contigs. HMM searches for known patterns from databases:
+### 2. Hidden markov model search on contigs. HMM searches for known patterns from databases:
 
 ```shell script
 #!/bin/bash
@@ -289,7 +294,7 @@ cd /work_beegfs/sunam230/Metagenomics/3_coassembly
 anvi-run-hmms -c contigs.db
 ```
 
-**3.** Assigning the terminal to a node on the CAU cluster (the front end is not suitable for running anvi´o interactive):
+### 3. Assigning the terminal to a node on the CAU cluster (the front end is not suitable for running anvi´o interactive):
 ```shell script
 # DIRECTLY IN THE TERMINAL:
 srun --reservation=biol217 --pty --mem=10G --nodes=1 --tasks-per-node=1 --cpus-per-task=1 --nodelist=n100 /bin/bash
@@ -323,14 +328,14 @@ The link http://127.0.0.1:8060 or http://127.0.0.1:8080 can be opened in the bro
 
 ## Workflow Binning with ANVI´O
 
-**1.** Sorting and indexing of mapping files (.bam) with **anvi-init-bam**. This uses **samtools** in the background:
+### 1. Sorting and indexing of mapping files (.bam) with **anvi-init-bam**. This uses **samtools** in the background:
 
 ```bash
 #bash script
 for i in *.bam; do anvi-init-bam $i -o "$i".sorted.bam; done
 ```
 
-**2.** Genome binning by **anvi´o**. The contigs will be grouped and assigned to individuel genomes. **anvi´o** uses binners like Metabat2 and binsanity in the background:
+### 2. Genome binning by **anvi´o**. The contigs will be grouped and assigned to individuel genomes. **anvi´o** uses binners like Metabat2 and binsanity in the background:
 
 - creating an anvi´o profile from .sorted.bam and .contig.db (only precesses contigs longer than 2500nts):
 ```bash
@@ -467,9 +472,9 @@ Lecture:
 
 ## Workflow Bin Refinement (only Archaea)
 
-**1.** Identifieng the Archaea strain bins from the binning results respectively. Then copy the single bin directories into an extra directory with all bins selected for refinement.
+### 1. Identifieng the Archaea strain bins from the binning results respectively. Then copy the single bin directories into an extra directory with all bins selected for refinement.
 
-**2.** Detection of chimerism and contamination by **GUNC**, which might result from mis-binning of genomic contigs from unrelated lineages. Therefore the output from seperate binners are used (in this script a different node and high memory is used for faster computation):
+### 2. Detection of chimerism and contamination by **GUNC**, which might result from mis-binning of genomic contigs from unrelated lineages. Therefore the output from seperate binners are used (in this script a different node and high memory is used for faster computation):
 
 ```bash
 #!/bin/bash
@@ -503,7 +508,7 @@ gunc plot -d ./diamond_output/METABAT__39-contigs.diamond.progenomes_2.1.out -g 
 Example visualization of a Archaeau METABAT bin:
 ![GUNC_refined_bin_Archaea_METABAT_39](./images/GUNC_visual_METABAT_bin_39_archaea.png)
 
-**3.** Manual bin refinement with **anvi-refine**. The unrefinded bin will be OVERWRITTEN by this program, so the unrefindes bin need du be copied as backup. Then:
+### 3. Manual bin refinement with **anvi-refine**. The unrefinded bin will be OVERWRITTEN by this program, so the unrefindes bin need du be copied as backup. Then:
 
 ```bash
 #TERMINAL
@@ -590,24 +595,30 @@ short reads: gaps possible
 - phred score: >20 good for microbes, 30 great, trimming afterwrds by fastp to clean reads
 
 
-## Workflow
+## Workflow: Genome Assembly to Classification
 
-**1.**
-- hybrid assembly of short and long reads combined. for that we use absolute paths to files $WORK/genomics/.../
+- hybrid assembly of short and long reads combined
+- use of absolute paths to files $WORK/genomics/.../, espacially in longer scripts
 - short reads give first assembly and long reads can be used to tackle missing gaps
-- create a new folder for all new outputs and sorting of data, numbers in front for later data pipeline
+- number for output directories
 
-- activate 01_short_reads_qc micromamaba environment:
-```bash
-module load gcc12-env/12.1.0
-module load miniconda3/4.12.0
-module load micromamba/1.4.2
-micromamba activate 01_short_reads_qc
-```
+| Tool | Version | Repository |
+| --- | --- | --- |
+| fastqc | 0.12.1 | [FastQC](https://github.com/s-andrews/FastQC ) |
+| fastp | 0.23.4 | [fastp](https://github.com/OpenGene/fastp ) |
+| NanoPlot | v1.19.0 | [NanoPlot](https://github.com/wdecoster/NanoPlot) |
+| Filtlong | ??? | [Filtlong](https://github.com/rrwick/Filtlong?tab=readme-ov-file#license) |
+| Unicycler | ??? | [Unicycler](https://github.com/rrwick/Unicycler) |
+| QUAST | 5.2.0 | [quast](https://quast.sourceforge.net/quast ) |
+| CheckM | v1.1.6 | [CheckM](https://ecogenomics.github.io/CheckM/) |
+| CheckM2 | 1.0.0 | [CheckM](https://github.com/chklovski/CheckM2) |
+| Prokka | ??? | [Prokka](https://github.com/tseemann/prokka) |
+| GTBTK | 2.3.2 | [GTBTK](https://ecogenomics.github.io/GTDBTk/) |
+| Multiqc | v1.19 | [Multiqc](https://multiqc.info/) |
 
-**2.** Quality Control and trimming:
 
-- short reads by **fastqc** and **fastp**
+
+### 1. Quality control and trimming of short reads by **fastqc** and **fastp**:
 
 ```bash
 #!/bin/bash
@@ -615,18 +626,24 @@ micromamba activate 01_short_reads_qc
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128G
 #SBATCH --time=5:00:00
-#SBATCH --job-name=01_fastqc_short
-#SBATCH --output=01_fastqc_short.out
-#SBATCH --error=01_fastqc_short.err
+#SBATCH --job-name=pipeline_genome_assembly
+#SBATCH --output=pipeline_genome_assembly.out
+#SBATCH --error=pipeline_genome_assembly.err
 #SBATCH --partition=base
 #SBATCH --reservation=biol217
 
 module load gcc12-env/12.1.0
+module load miniconda3/4.12.0 #for GTDB-tk database path
 module load micromamba/1.4.2
+export MAMBA_ROOT_PREFIX=$HOME/.micromamba
+eval "$(micromamba shell hook --shell=bash)"
+
+# 1 Short read cleaning-------------------------------------------------------
+
+echo "---------short read cleaning started---------"
 micromamba activate 01_short_reads_qc
 
-
-## 1.1 fastqc raw reads
+## 1.1 fastqc raw
 mkdir -p $WORK/genomics/1_short_reads_qc/1_fastqc_raw
 for i in $WORK/genomics/0_raw_reads/short_reads/*.gz; do fastqc $i -o $WORK/genomics/1_short_reads_qc/1_fastqc_raw -t 32; done
 
@@ -637,15 +654,13 @@ fastp -i $WORK/genomics/0_raw_reads/short_reads/241155E_R1.fastq.gz \
  -R $WORK/genomics/1_short_reads_qc/2_cleaned_reads/fastp_report \
  -h $WORK/genomics/1_short_reads_qc/2_cleaned_reads/report.html \
  -o $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R1_clean.fastq.gz \
- -O $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R2_clean.fastq.gz -t 6 -q 25
+ -O $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R2_clean.fastq.gz -t 32 -q 25
 
 ## 1.3 fastqc cleaned
 mkdir -p $WORK/genomics/1_short_reads_qc/3_fastqc_cleaned
 for i in $WORK/genomics/1_short_reads_qc/2_cleaned_reads/*.gz; do fastqc $i -o $WORK/genomics/1_short_reads_qc/3_fastqc_cleaned -t 12; done
 micromamba deactivate
 echo "---------short read cleaning completed successfully---------"
-
-jobinfo
 ```
 [fastqc report raw read](./reports/genomics/241155E_R1_fastqc.html)
 
@@ -664,30 +679,18 @@ Did the quality of the reads improve after trimming?
 yes, but only small changes and only small amount of adapters removed
 
 
-- long reads by **NanoPlot** and **Filtlong**
+### 2. Quality control and trimming of long reads by **NanoPlot** and **filtlong**:
+
 ```bash
-#!/bin/bash
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=128G
-#SBATCH --time=5:00:00
-#SBATCH --job-name=02_long_reads_qcHow Good is the read quality?
-most reads have phred score between 30 and 37, no sequences flagged as poor quality from fastqc
-
-How many reads do you had before trimming and how many do you have now?
-before: 3279098 after: 3226784
-
-Did the quality of the reads improve after trimming?
-yes, but only small changes and only small amount of adapters removed
-
-eval "$(micromamba shell hook --shell=bash)"
+# 2 Long read cleaning-----------------------------------------------------
+echo "---------long reads cleaning started---------"
 micromamba activate 02_long_reads_qc
 
 ## 2.1 Nanoplot raw
 cd $WORK/genomics/0_raw_reads/long_reads/
 mkdir -p $WORK/genomics/2_long_reads_qc/1_nanoplot_raw
 NanoPlot --fastq $WORK/genomics/0_raw_reads/long_reads/*.gz \
- -o $WORK/genomics/2_long_reads_qc/1_nanoplot_raw -t 32 \
+ -o $WORK/genomics/2_long_reads_qc/1_nanoplot_raw -t 12 \
  --maxlength 40000 --minlength 1000 --plots kde --format png \
  --N50 --dpi 300 --store --raw --tsv_stats --info_in_report
 
@@ -699,15 +702,12 @@ filtlong --min_length 1000 --keep_percent 90 $WORK/genomics/0_raw_reads/long_rea
 cd $WORK/genomics/2_long_reads_qc/2_cleaned_reads
 mkdir -p $WORK/genomics/2_long_reads_qc/3_nanoplot_cleaned
 NanoPlot --fastq $WORK/genomics/2_long_reads_qc/2_cleaned_reads/*.gz \
- -o $WORK/genomics/2_long_reads_qc/3_nanoplot_cleaned -t 32 \
+ -o $WORK/genomics/2_long_reads_qc/3_nanoplot_cleaned -t 12 \
  --maxlength 40000 --minlength 1000 --plots kde --format png \
  --N50 --dpi 300 --store --raw --tsv_stats --info_in_report
 
-
-echo "---------long reads cleaning completed Successfully---------"
 micromamba deactivate
-module purge
-jobinfo
+echo "---------long reads cleaning completed Successfully---------"
 ```
 [NanoPlot report raw reads](./reports/genomics/NanoPlot-report.html)
 
@@ -724,13 +724,104 @@ mean quality: 11.4
 
 
 
-**3.** Hybrid assembly out of short AND long reads: 
+### 3./4. Hybrid assembly out of short AND long reads and quality control: 
+
+- assembly by **unicycler**
+- quality control by **QUAST**, **CheckM** and **CheckM2** (most recent)
+
+```bash
+# 3 Assembly (1 hour)-----------------------------------------------------------
+echo "---------Unicycler Assembly pipeline started---------"
+micromamba activate 03_unicycler
+cd $WORK/genomics
+mkdir -p $WORK/genomics/3_hybrid_assembly
+unicycler -1 $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R1_clean.fastq.gz -2 $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R2_clean.fastq.gz -l $WORK/genomics/2_long_reads_qc/2_cleaned_reads/241155E_cleaned_filtlong.fastq.gz -o $WORK/genomics/3_hybrid_assembly/ -t 32
+micromamba deactivate
+echo "---------Unicycler Assembly pipeline Completed Successfully---------"
+
+# 4 Assembly quality-----------------------------------------------------------
+echo "---------Assembly Quality Check Started---------"
+
+## 4.1 Quast (5 minutes)
+micromamba activate 04_checkm_quast
+cd $WORK/genomics/3_hybrid_assembly
+mkdir -p $WORK/genomics/3_hybrid_assembly/quast
+quast.py $WORK/genomics/3_hybrid_assembly/assembly.fasta --circos -L --conserved-genes-finding --rna-finding \
+ --glimmer --use-all-alignments --report-all-metrics -o $WORK/genomics/3_hybrid_assembly/quast -t 32
+micromamba deactivate
+
+## 4.2 CheckM
+micromamba activate 04_checkm_quast
+cd $WORK/genomics/3_hybrid_assembly
+mkdir -p $WORK/genomics/3_hybrid_assembly/checkm
+checkm lineage_wf $WORK/genomics/3_hybrid_assembly/ $WORK/genomics/3_hybrid_assembly/checkm -x fasta --tab_table --file $WORK/genomics/3_hybrid_assembly/checkm/checkm_results -r -t 32
+checkm tree_qa $WORK/genomics/3_hybrid_assembly/checkm
+checkm qa $WORK/genomics/3_hybrid_assembly/checkm/lineage.ms $WORK/genomics/3_hybrid_assembly/checkm/ -o 1 > $WORK/genomics/3_hybrid_assembly/checkm/Final_table_01.csv
+checkm qa $WORK/genomics/3_hybrid_assembly/checkm/lineage.ms $WORK/genomics/3_hybrid_assembly/checkm/ -o 2 > $WORK/genomics/3_hybrid_assembly/checkm/final_table_checkm.csv
+micromamba deactivate
+
+# 4.3 Checkm2
+# (can not work, maybe due to insufficient memory usage)
+micromamba activate 05_checkm2
+cd $WORK/genomics/3_hybrid_assembly
+mkdir -p $WORK/genomics/3_hybrid_assembly/checkm2
+checkm2 predict --threads 32 --input $WORK/genomics/3_hybrid_assembly/* --output-directory $WORK/genomics/3_hybrid_assembly/checkm2 
+micromamba deactivate
+echo "---------Assembly Quality Check Completed Successfully---------"
+```
+
+### 4. Annotation of contigs by **prokka**:
+
+```bash
+# 5 Annotate-----------------------------------------------------------
+echo "---------Prokka Genome Annotation Started---------"
+
+micromamba activate 06_prokka
+cd $WORK/genomics/3_hybrid_assembly
+# Prokka creates the output dir on its own
+prokka $WORK/genomics/3_hybrid_assembly/assembly.fasta --outdir $WORK/genomics/4_annotated_genome --kingdom Bacteria --addgenes --cpus 32
+micromamba deactivate
+echo "---------Prokka Genome Annotation Completed Successfully---------"
+```
+
+### 5. Classification of genes by **gtdbtk**:
+
+```bash
+# 6 Classification-----------------------------------------------------------
+echo "---------GTDB Classification Started---------"
+# (can not work, maybe due to insufficient memory usage increase the ram in bash script)
+micromamba activate 07_gtdbtk
+conda env config vars set GTDBTK_DATA_PATH="$WORK/Databases/GTDBTK_day6";
+micromamba activate 07_gtdbtk
+cd $WORK/genomics/4_annotated_genome
+mkdir -p $WORK/genomics/5_gtdb_classification
+echo "---------GTDB Classification will run now---------"
+gtdbtk classify_wf --cpus 12 --genome_dir $WORK/genomics/4_annotated_genome/ --out_dir $WORK/genomics/5_gtdb_classification --extension .fna 
+# reduce cpu and increase the ram in bash script in order to have best performance
+micromamba deactivate
+echo "---------GTDB Classification Completed Successfully---------"
+```
+
+### 6. Final quality control combining all steps by **multiqc**:
+
+```bash
+# 7 multiqc-----------------------------------------------------------
+echo "---------Multiqc Started---------"
+micromamba activate 01_short_reads_qc
+multiqc -d $WORK/genomics/ -o $WORK/genomics/6_multiqc
+micromamba deactivate
+echo "---------Multiqc Completed Successfully---------"
 
 
-****     entire pipeline         ****
+module purge
+jobinfo
+```
 
-**** links to programs in script ****
+[MULTIQC REPORT](./reports/genomics/multiqc_report.html)
 
+---
+
+*NOTES* 
 - **Unicycler** for assembly (maximal nr of threads correspond to used cpus) of long and short from the SAME sample
 - **Quast, CheckM, CheckM2** Quast uses busco database, for quality control of assembly (quality matrices), output in .csv files (contamination: bp not belonging to an an assembly, best: low nr of contigs), N50 = 1 means over 50% of genome is in a single contig, CheckM2 is state of the arts AI prediction
 - annotation data in .gff file by **Prokka**: rapid for prokaryotes, visualization in **Integrated Genome Browser**
@@ -739,29 +830,32 @@ mean quality: 11.4
 - **Bandage** on local PC, shows contigs in different colors. identification of contaminations (less than 1kb contig need to be realuvated or deleted from fasta file), shows different contigs (tiny contigs can be removed)
 - classification compares whole genomes and taxonomy (in comparison to annotation only)
 
-[MULTIQC REPORT](./reports/genomics/multiqc_report.html)
-
-
 - NCBI search on reference number of species. further information there in taxonomy browse, also the reference genome and list of all submitted assemblies (which can be used for pangenomics). 4 levels of assembly-completeness (contig --- complete), genome size can be compared of own assembly to reference (should not be smaller for good quality). download of assembled genomes in different formats (FASTA,...)
 
-*QUESTIONS:*
+---
 
-- How good is the quality of genome?
+### *QUESTIONS:*
 
-CheckM completeness of 98.88%, Contamination of 0.19%, QUAST shows 7 contigs (4 are <1000bp) and L50 = 1
+*How good is the quality of genome?*
+
+CheckM completeness of 98.88% and contamination of 0.19%. QUAST shows 7 contigs (4 are <1000bp) and L50 = 1
 --> good quality
 
-- Why did we use hybrid assembler?
-long reads are used to fill up gaps and account for errors that might occure by the assembly of the cleaned short read sequences
+ *Why did we use hybrid assembler?*
 
-- What is the difference between short and long reads?
+Long reads are used to fill up gaps and account for errors that might occure by the assembly of the cleaned short read sequences.
 
+*What is the difference between short and long reads?*
 
-- Did we use Single or Paired end reads? Why?
+The length of reads depends on the sequencing technique by which the reads are generated. Illumina sequencing results in short reads of 150bp, whereas Nanopore sequencing results in long reads over 1kb.
 
+*Did we use Single or Paired end reads? Why?*
 
-- Write down about the classification of genome we have used here.
-97% identity to a classified genome found in NCBI, leads to assume it is the same species (>95%) GCF_004793475.1; Bacteroides muris (<95% only group, >99% same strain)
+Both: long read sequences where single end and short read sequences where double end reads (R1/R2). The kind of reads are dependent on the sequencing technique. If possible, paired end reads are prefered as more errors can be recovered.
+
+*Write down about the classification of genome we have used here.*
+
+Classification by gtdbtk results in 95% identity to reference gene GCF_004793475.1 (Bacteroides sp002491635). This genome is also submitted at NCBI. A value of 95% identity leads to assume it is the same species, Bacteroides muris. (<95% only group, >99% same strain)
 
 
 # Day 7: Pangenomics
@@ -772,7 +866,7 @@ long reads are used to fill up gaps and account for errors that might occure by 
 
 ## Workflow
 
-**1.** Run **PANAROO** pipeline (only runs on .gff files from Prokka):
+### 1. Run **PANAROO** pipeline (only runs on .gff files from Prokka):
 
 ```bash
 #!/bin/bash

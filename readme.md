@@ -6,7 +6,7 @@ Protocol progress:
 - Day 3 unfinished: introduction, script unfinished for binning
 - Day 4 lecture notes
 - Day 5 lecture notes, questions!! Bin quality check: CSS score inicates chimeras on different taxonomic levels (GUNC) output
-- Day 6 notes, entire pipeline in protocol not finished (pipeline_genome_assembly_to_classification.sh), visualization with bandage
+- Day 6 notes visualization with bandage
 
 ## TODo
 
