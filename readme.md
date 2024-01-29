@@ -10,4 +10,5 @@ Protocol progress:
 
 ## TODo
 
--avarage nt identity for classification
+- avarage nt identity for classification
+- add versions of all programs

@@ -562,10 +562,9 @@ anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db --meta
 ```
 
 
-## Workflow Genome Dereplication
 
 
-# Day 6: Genomics and Pangenomics
+# Day 6: Genomics
 
 !Isolated cultures from now on, no metagenomes!
 
@@ -742,6 +741,9 @@ mean quality: 11.4
 
 [MULTIQC REPORT](./reports/genomics/multiqc_report.html)
 
+
+- NCBI search on reference number of species. further information there in taxonomy browse, also the reference genome and list of all submitted assemblies (which can be used for pangenomics). 4 levels of assembly-completeness (contig --- complete), genome size can be compared of own assembly to reference (should not be smaller for good quality). download of assembled genomes in different formats (FASTA,...)
+
 *QUESTIONS:*
 
 - How good is the quality of genome?
@@ -758,4 +760,46 @@ long reads are used to fill up gaps and account for errors that might occure by 
 - Did we use Single or Paired end reads? Why?
 
 
-- Write down about the classification of genome we have used here
+- Write down about the classification of genome we have used here.
+97% identity to a classified genome found in NCBI, leads to assume it is the same species (>95%) GCF_004793475.1; Bacteroides muris (<95% only group, >99% same strain)
+
+
+# Day 7: Pangenomics
+
+- https://panexplorer.southgreen.fr/cgi-bin/home.cgi (automated pipleine online) only takes in files and fully automatic runs everything
+- core-genome
+- accessory genomes
+
+## Workflow
+
+**1.** Run **PANAROO** pipeline (only runs on .gff files from Prokka):
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --time=15:00:00
+#SBATCH --job-name=panaroo
+#SBATCH --output=panaroo.out
+#SBATCH --error=panaroo.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load micromamba/1.4.2
+export MAMBA_ROOT_PREFIX=$HOME/.micromamba
+eval "$(micromamba shell hook --shell=bash)"
+module load micromamba/1.4.2
+micromamba activate 08_panaroo
+#creata a folder for panaroo
+mkdir -p $WORK/pangenomics/01_panaroo
+# run panaroo
+panaroo -i $WORK/pangenomics/gffs/*.gff -o $WORK/pangenomics/01_panaroo/pangenomics_results --clean-mode strict -t 12
+
+
+micromamba deactivate
+module purge
+jobinfo
+
+```
+
