@@ -6,6 +6,6 @@ Protocol progress:
 - Day 3 unfinished: introduction, script unfinished for binning
 - Day 4 lecture notes
 - Day 5 lecture notes, questions!! Bin quality check: CSS score inicates chimeras on different taxonomic levels (GUNC) output
+- Day 6 notes
 
 ## TODo
-- saturday: formulate notes in protocol

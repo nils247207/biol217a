@@ -604,9 +604,9 @@ module load micromamba/1.4.2
 micromamba activate 01_short_reads_qc
 ```
 
-**2.** Quality Control by **fastqc**
+**2.** Quality Control and trimming:
 
-- short reads:
+- short reads by **fastqc** and **fastp**
 
 ```bash
 #!/bin/bash
@@ -638,8 +638,18 @@ fastp -i $WORK/genomics/0_raw_reads/short_reads/241155E_R1.fastq.gz \
  -o $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R1_clean.fastq.gz \
  -O $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R2_clean.fastq.gz -t 6 -q 25
 
+## 1.3 fastqc cleaned
+mkdir -p $WORK/genomics/1_short_reads_qc/3_fastqc_cleaned
+for i in $WORK/genomics/1_short_reads_qc/2_cleaned_reads/*.gz; do fastqc $i -o $WORK/genomics/1_short_reads_qc/3_fastqc_cleaned -t 12; done
+micromamba deactivate
+echo "---------short read cleaning completed successfully---------"
+
 jobinfo
 ```
-[fastqc report](./reports/genomics/241155E_R1_fastqc.html)
+[fastqc report raw read](./reports/genomics/241155E_R1_fastqc.html)
 
 [fastp report](./reports/genomics/report.html)
+
+[fastqc report cleaned raw read](./reports/genomics/241155E_R1_clean_fastqc.html)
+
+
