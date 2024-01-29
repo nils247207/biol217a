@@ -653,3 +653,70 @@ jobinfo
 [fastqc report cleaned raw read](./reports/genomics/241155E_R1_clean_fastqc.html)
 
 
+How Good is the read quality?
+most reads have phred score between 30 and 37, no sequences flagged as poor quality from fastqc
+
+How many reads do you had before trimming and how many do you have now?
+before: 3279098 after: 3226784
+
+Did the quality of the reads improve after trimming?
+yes, but only small changes and only small amount of adapters removed
+
+
+- long reads by **NanoPlot** and **Filtlong**
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=02_long_reads_qcHow Good is the read quality?
+most reads have phred score between 30 and 37, no sequences flagged as poor quality from fastqc
+
+How many reads do you had before trimming and how many do you have now?
+before: 3279098 after: 3226784
+
+Did the quality of the reads improve after trimming?
+yes, but only small changes and only small amount of adapters removed
+
+eval "$(micromamba shell hook --shell=bash)"
+micromamba activate 02_long_reads_qc
+
+## 2.1 Nanoplot raw
+cd $WORK/genomics/0_raw_reads/long_reads/
+mkdir -p $WORK/genomics/2_long_reads_qc/1_nanoplot_raw
+NanoPlot --fastq $WORK/genomics/0_raw_reads/long_reads/*.gz \
+ -o $WORK/genomics/2_long_reads_qc/1_nanoplot_raw -t 32 \
+ --maxlength 40000 --minlength 1000 --plots kde --format png \
+ --N50 --dpi 300 --store --raw --tsv_stats --info_in_report
+
+## 2.2 Filtlong
+mkdir -p $WORK/genomics/2_long_reads_qc/2_cleaned_reads
+filtlong --min_length 1000 --keep_percent 90 $WORK/genomics/0_raw_reads/long_reads/*.gz | gzip > $WORK/genomics/2_long_reads_qc/2_cleaned_reads/241155E_cleaned_filtlong.fastq.gz
+
+## 2.3 Nanoplot cleaned
+cd $WORK/genomics/2_long_reads_qc/2_cleaned_reads
+mkdir -p $WORK/genomics/2_long_reads_qc/3_nanoplot_cleaned
+NanoPlot --fastq $WORK/genomics/2_long_reads_qc/2_cleaned_reads/*.gz \
+ -o $WORK/genomics/2_long_reads_qc/3_nanoplot_cleaned -t 32 \
+ --maxlength 40000 --minlength 1000 --plots kde --format png \
+ --N50 --dpi 300 --store --raw --tsv_stats --info_in_report
+
+
+echo "---------long reads cleaning completed Successfully---------"
+micromamba deactivate
+module purge
+jobinfo
+```
+[NanoPlot report raw reads](./reports/genomics/NanoPlot-report.html)
+
+[NanoPlot report cleaned reads](./reports/genomics/NanoPlot-report-cleaned.html)
+
+How Good is the read quality?
+
+
+How many reads do you had before trimming and how many do you have now?
+
+
+Did the quality of the reads improve after trimming?
+
