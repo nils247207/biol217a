@@ -713,10 +713,10 @@ jobinfo
 [NanoPlot report cleaned reads](./reports/genomics/NanoPlot-report-cleaned.html)
 
 How Good is the read quality?
-
+mean quality 10.4, 
 
 How many reads do you had before trimming and how many do you have now?
-
+before: 15963 after: 12446
 
 Did the quality of the reads improve after trimming?
-
+mean quality: 11.4
