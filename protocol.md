@@ -564,3 +564,82 @@ anvi-summarize -p ./merged_profiles/PROFILE.db -c ../4_mapping/contigs.db --meta
 
 ## Workflow Genome Dereplication
 
+
+# Day 6: Genomics and Pangenomics
+
+!Isolated cultures from now on, no metagenomes!
+
+- Genomics: replication of DNA, structure of genes, "Genome": all un-/translated genes
+- Transcriptomics: transcription of DNA to RNA
+- Proteomics: translation of AA
+- Pangenomics: functional RNA genes and protein coding genes and non-coding genes in a group of related organisms. focus on genetic diversity and accessory genomes. comparing which characteristics are common for all individuals
+
+- assembled and annotated genome important as reference for different steps (steps on slide day 6)
+SEQUENCING
+
+long reads: 
+
+- nanopore: motor protein adapted pulls DNA through pore, 400bp/s, membrane potential on membrane is measured
+- usually single end reads
+
+short reads: gaps possible 
+
+- long reads: more than 10kb possible
+- single vs paired end reads: double verification by pairs
+- Illumina up to 150bp, paired with defined gap
+- .fastq (.gz compression) format files: label, sequence, Q scores
+- phred score: >20 good for microbes, 30 great, trimming afterwrds by fastp to clean reads
+
+
+## Workflow
+
+**1.**
+- hybrid assembly of short and long reads combined. for that we use absolute paths to files $WORK/genomics/.../
+- create a new folder for all new outputs and sorting of data, numbers in front for later data pipeline
+- activate 01_short_reads_qc micromamaba environment:
+```bash
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+module load micromamba/1.4.2
+micromamba activate 01_short_reads_qc
+```
+
+**2.** Quality Control by **fastqc**
+
+- short reads:
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=01_fastqc_short
+#SBATCH --output=01_fastqc_short.out
+#SBATCH --error=01_fastqc_short.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load micromamba/1.4.2
+micromamba activate 01_short_reads_qc
+
+
+## 1.1 fastqc raw reads
+mkdir -p $WORK/genomics/1_short_reads_qc/1_fastqc_raw
+for i in $WORK/genomics/0_raw_reads/short_reads/*.gz; do fastqc $i -o $WORK/genomics/1_short_reads_qc/1_fastqc_raw -t 32; done
+
+## 1.2 fastp 
+mkdir -p $WORK/genomics/1_short_reads_qc/2_cleaned_reads
+fastp -i $WORK/genomics/0_raw_reads/short_reads/241155E_R1.fastq.gz \
+ -I $WORK/genomics/0_raw_reads/short_reads/241155E_R2.fastq.gz \
+ -R $WORK/genomics/1_short_reads_qc/2_cleaned_reads/fastp_report \
+ -h $WORK/genomics/1_short_reads_qc/2_cleaned_reads/report.html \
+ -o $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R1_clean.fastq.gz \
+ -O $WORK/genomics/1_short_reads_qc/2_cleaned_reads/241155E_R2_clean.fastq.gz -t 6 -q 25
+
+jobinfo
+```
+[fastqc report](./reports/genomics/241155E_R1_fastqc.html)
+
+[fastp report](./reports/genomics/report.html)
