@@ -866,6 +866,7 @@ Classification by gtdbtk results in 95% identity to reference gene GCF_004793475
 - singleton genes
 
 - genomes are compared by GENE-CLUSTERS (which have been resolved by algorythm from BLAST identity hits between all genes throughout all genomes)
+- comparison of (same) species between environments
 
 Lecture:
 
@@ -893,7 +894,7 @@ Phlyogenomics and Taxonomy:
 - orthology predections
 - databases: TYGS/DSZM (cultured type strains), JSpeciesWs (many databases combined)
 - 95% completeness (SCGs) important, otherwise genome is too small for reliable phylogenomics
-- 
+- accessory gene clusters can infer phylogenomics
 
 Concept:
 
@@ -939,6 +940,7 @@ jobinfo
 - Gene clustering based on AA sequences, by comparing each gene between the different genomes
 - from lecture: AA .fasta of all genomes --> BLAST-DB --> BLAST-DB against .fasta of all genomes to identify all hits (in %) of a gene against all other genes from the same genome and all other genomes
 - next mcl resolves the identity values into a network of gene clusters (de novo, without annotations, clustering of homologue genes --> POWER!!)
+- final overlay of annotated functions corresponds to predicted clusters (eg core-genoms usually have a function, many of them might be known and shown in overlay)
 
 | Program or Database                                          | Function                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
