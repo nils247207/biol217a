@@ -929,4 +929,92 @@ jobinfo
 
 ## Workflow by Anvio
 
-### 1.
+| Program or Database                                          | Function                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [anvi'o](https://anvio.org/)                                 | Wrapper for genome comparissons                              |
+| [DIAMOND](https://www.wsi.uni-tuebingen.de/lehrstuehle/algorithms-in-bioinformatics/software/diamond/) | creates high-throughput protein alignments                   |
+| [pyANI](https://github.com/widdowquinn/pyani)                | calculates genome similarities based on average nucleotide identity |
+| [KEGG](https://www.kegg.jp/)                                 | Kyoto Encyclopaedia of Genes and Genomes (Database)          |
+| [NCBI COG](https://www.ncbi.nlm.nih.gov/research/cog)        | Clusters of Orthologous Genes (Database)                     |
+
+### 1. Download 52 Vibrio jasicida strains
+
+```bash
+#TERMINAL
+
+curl -L https://ndownloader.figshare.com/files/28965090 -o V_jascida_genomes.tar.gz
+tar -zxvf V_jascida_genomes.tar.gz
+ls V_jascida_genomes
+```
+
+
+### 2. Load required modules:
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=anvio_pangenomics
+#SBATCH --output=anvio_pangenomics.out
+#SBATCH --error=anvio_pangenomics.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+# create new folder
+mkdir $WORK/pangenomics/02_anvio_pangenomics
+```
+
+### 3. Create contigs.db from .fasta files:
+
+```bash
+cd $WORK/pangenomics/02_anvio_pangenomics/V_jascida_genomes/
+
+ls *fasta | awk 'BEGIN{FS="_"}{print $1}' > genomes.txt
+
+# remove all contigs <2500 nt
+for g in `cat genomes.txt`
+do
+    echo
+    echo "Working on $g ..."
+    echo
+    anvi-script-reformat-fasta ${g}_scaffolds.fasta \
+                               --min-len 2500 \
+                               --simplify-names \
+                               -o ${g}_scaffolds_2.5K.fasta
+done
+
+# generate contigs.db
+for g in `cat genomes.txt`
+do
+    echo
+    echo "Working on $g ..."
+    echo
+    anvi-gen-contigs-database -f ${g}_scaffolds_2.5K.fasta \
+                              -o V_jascida_${g}.db \
+                              --num-threads 4 \
+                              -n V_jascida_${g}
+done
+
+# annotate contigs.db
+for g in *.db
+do
+    anvi-run-hmms -c $g --num-threads 4
+    anvi-run-ncbi-cogs -c $g --num-threads 4
+    anvi-scan-trnas -c $g --num-threads 4
+    anvi-run-scg-taxonomy -c $g --num-threads 4
+done
+```
+
+### 4. Visualize contigs.db:
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8
+
+anvi-display-contigs-stats /path/to.your/databases/*db
