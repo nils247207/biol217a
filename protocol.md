@@ -18,7 +18,7 @@ cp source destination
 
 # Day 2: Introduction to Metagenomics and Metagenomic Workflow
 
-*[Overview Workflow](./MAG_workflow.pdf)*
+*[Overview Workflow](./concepts_and_overviews/MAG_workflow.pdf)*
 
 ### Metagenomics
 
@@ -862,7 +862,10 @@ Classification by gtdbtk results in 95% identity to reference gene GCF_004793475
 
 - https://panexplorer.southgreen.fr/cgi-bin/home.cgi (automated pipleine online) only takes in files and fully automatic runs everything
 - core-genome
-- accessory genomes
+- accesssory genes
+- singleton genes
+
+- genomes are compared by GENE-CLUSTERS (which have been resolved by algorythm from BLAST identity hits between all genes throughout all genomes)
 
 Lecture:
 
@@ -877,7 +880,7 @@ Lecture:
 - singletons: genes present ONLY in one genome, unique for a species
 - General quality information: completion? redundancy? GC-content, singletons
 - "Pangenome" content defined by research question
-- AA sequence for gene cluster analysis --> no funtion known at this point
+- AA sequence for gene cluster analysis, better for inferring distance homology, then DNA sequence with synonomous mutation --> no funtion known at this point
 - completeness messured by presence of SCGs
 
 
@@ -891,6 +894,10 @@ Phlyogenomics and Taxonomy:
 - databases: TYGS/DSZM (cultured type strains), JSpeciesWs (many databases combined)
 - 95% completeness (SCGs) important, otherwise genome is too small for reliable phylogenomics
 - 
+
+Concept:
+
+![concept-of-pangenomics](./concepts_and_overviews/concept-of-pangenomics.png)
 
 
 ## Workflow by PANAROO
@@ -928,6 +935,10 @@ jobinfo
 ```
 
 ## Workflow by Anvio (step 3-7 did not work due to incomplete database and reinstallation of anvio, results copied into own $WORK)
+
+- Gene clustering based on AA sequences, by comparing each gene between the different genomes
+- from lecture: AA .fasta of all genomes --> BLAST-DB --> BLAST-DB against .fasta of all genomes to identify all hits (in %) of a gene against all other genes from the same genome and all other genomes
+- next mcl resolves the identity values into a network of gene clusters (de novo, without annotations, clustering of homologue genes --> POWER!!)
 
 | Program or Database                                          | Function                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
