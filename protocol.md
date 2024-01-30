@@ -1048,3 +1048,13 @@ anvi-profile -c V_jascida_52.db \
              --blank
 ```
 
+### 8. Splitting the genome in the good bins:
+
+
+### 9. Estimate completeness of the split vs unsplit genome:
+
+
+### 10. Compute pangenome:
+
+
+### 11. Display the pangenome:
