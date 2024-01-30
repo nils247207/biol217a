@@ -1041,20 +1041,15 @@ anvi-estimate-genome-completeness -e external-genomes.txt
 
 ### 7. Visualize contigs for refinement:
 
+- after identifying genomes with bad quality or contamination, look into the identified genome 
+- for that a anvi-profile has to be run before using anvi-interactive on the single genome
+
 ```bash
-anvi-profile -c V_jascida_52.db \
+anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
              --sample-name V_jascida_52 \
-             --output-dir V_jascida_52 \
+             --output-dir $WORK/anvio_results/V_jascida_genomes/V_jascida_52 \
              --blank
 ```
+```bash
+#TERMINAL
 
-### 8. Splitting the genome in the good bins:
-
-
-### 9. Estimate completeness of the split vs unsplit genome:
-
-
-### 10. Compute pangenome:
-
-
-### 11. Display the pangenome:
