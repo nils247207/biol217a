@@ -864,9 +864,40 @@ Classification by gtdbtk results in 95% identity to reference gene GCF_004793475
 - core-genome
 - accessory genomes
 
-## Workflow
+Lecture:
+
+- comparing similarities, phylogeny based on *Dendograms* , which show sequence distance and are ordered in gene-clusters, NOT true order of clusters on  the genomes
+- "gene-cluster": sequences with high nt similarity
+- guesses on similiar functions
+- ANI shows how many nucleotides are similiar
+- see evolution over time of the same strains
+- SGGs: 
+- core genes: necassary for survival and present in all species of a group
+- accessory genes: unique only for a group of species 
+- singletons: genes present ONLY in one genome, unique for a species
+- General quality information: completion? redundancy? GC-content, singletons
+- "Pangenome" content defined by research question
+- AA sequence for gene cluster analysis --> no funtion known at this point
+- completeness messured by presence of SCGs
+
+
+Phlyogenomics and Taxonomy:
+
+- SCGs presence also useful for phylogenomics
+- not relying on only one gene (eg 16S rRNA in phyloGENETIC approach)
+- ANI score: >95% to assume same species, important measure for whole genome similarity
+- RED score: measure for higher species groups, resolution not enough on species level
+- orthology predections
+- databases: TYGS/DSZM (cultured type strains), JSpeciesWs (many databases combined)
+- 95% completeness (SCGs) important, otherwise genome is too small for reliable phylogenomics
+- 
+
+
+## Workflow by PANAROO
 
 ### 1. Run **PANAROO** pipeline (only runs on .gff files from Prokka):
+
+- clean-mode on strict
 
 ```bash
 #!/bin/bash
@@ -894,6 +925,8 @@ panaroo -i $WORK/pangenomics/gffs/*.gff -o $WORK/pangenomics/01_panaroo/pangenom
 micromamba deactivate
 module purge
 jobinfo
-
 ```
 
+## Workflow by Anvio
+
+### 1.

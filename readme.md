@@ -12,3 +12,5 @@ Protocol progress:
 
 - avarage nt identity for classification
 - add versions of all programs
+- pacbio video on yt
+- bandage/IGB in protocol and citation
