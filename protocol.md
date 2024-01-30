@@ -1055,7 +1055,7 @@ anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
 
 module load gcc12-env/12.1.0
 module load miniconda3/4.12.0
-conda activate anvio-8_biol217
+conda activate anvio-8
 
 anvi-interactive -c V_jascida_52.db \
                  -p V_jascida_52/PROFILE.db
@@ -1067,3 +1067,32 @@ anvi-interactive -c V_jascida_52.db \
 
 ### 8. Splitting the genome in the good bins
 
+```bash
+anvi-split -p V_jascida_52/PROFILE.db \
+           -c V_jascida_52.db \
+           -C default \
+           -o V_jascida_52_SPLIT --force-overwrite
+
+# Here are the files you created
+#V_jascida_52_SPLIT/V_jascida_52_CLEAN/CONTIGS.db
+
+sed 's/V_jascida_52.db/V_jascida_52_SPLIT\/V_jascida_52_CLEAN\/CONTIGS.db/g' external-genomes.txt > external-genomes-final.txt
+```
+
+### 9. Estimate completeness of split vs unsplit genome:
+
+```bash
+anvi-estimate-genome-completeness -e external-genomes.txt
+anvi-estimate-genome-completeness -e external-genomes-final.txt
+```
+
+### 10. Compute pangenome:
+
+```bash
+anvi-gen-genomes-storage -e external-genomes-final.txt \
+                         -o V_jascida-GENOMES.db
+
+anvi-pan-genome -g V_jascida-GENOMES.db \
+                --project-name V_jascida \
+                --num-threads 4
+```
