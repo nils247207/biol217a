@@ -1013,8 +1013,38 @@ done
 
 ### 4. Visualize contigs.db:
 
+```bash
+#TERMINAL
+
 module load gcc12-env/12.1.0
 module load miniconda3/4.12.0
 conda activate anvio-8
 
-anvi-display-contigs-stats /path/to.your/databases/*db
+anvi-display-contigs-stats $WORK/pangenomics/02_anvio_pangenomics/V_jascida_genomes/*db
+```
+
+### 5. Create external genomes file ??from .db or original fasta??
+
+```bash
+anvi-script-gen-genomes-file --input-dir /path/to/input/dir \
+                             -o external-genomes.txt
+```
+
+### 6. Investigate contaminations:
+
+```bash
+#TERMINAL
+
+cd V_jascida_genomes
+anvi-estimate-genome-completeness -e external-genomes.txt
+```
+
+### 7. Visualize contigs for refinement:
+
+```bash
+anvi-profile -c V_jascida_52.db \
+             --sample-name V_jascida_52 \
+             --output-dir V_jascida_52 \
+             --blank
+```
+
