@@ -927,7 +927,7 @@ module purge
 jobinfo
 ```
 
-## Workflow by Anvio
+## Workflow by Anvio (step 3-7 did not work due to incomplete database and reinstallation of anvio, results copied into own $WORK)
 
 | Program or Database                                          | Function                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -1041,7 +1041,7 @@ anvi-estimate-genome-completeness -e external-genomes.txt
 
 ### 7. Visualize contigs for refinement:
 
-- after identifying genomes with bad quality or contamination, look into the identified genome 
+- after identifying genomes with bad quality or contamination, look into the identified genome (V_jascida52)
 - for that a anvi-profile has to be run before using anvi-interactive on the single genome
 
 ```bash
@@ -1052,4 +1052,18 @@ anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
 ```
 ```bash
 #TERMINAL
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+conda activate anvio-8_biol217
+
+anvi-interactive -c V_jascida_52.db \
+                 -p V_jascida_52/PROFILE.db
+```
+
+- in the program bins with small lengths are descarded and the cleaned bin is saved for later pangenomic analysis
+
+![V_jascida_52_CLEAN2](./images/pangenomics/V_jascida_52_CLEAN2_bin.png)
+
+### 8. Splitting the genome in the good bins
 
