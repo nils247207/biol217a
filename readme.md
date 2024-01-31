@@ -7,6 +7,7 @@ Protocol progress:
 - Day 4 lecture notes
 - Day 5 lecture notes, questions!! Bin quality check: CSS score inicates chimeras on different taxonomic levels (GUNC) output
 - Day 6 notes visualization with bandage
+- Day 8: outputs from fastqc missing
 
 ## TODo
 

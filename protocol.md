@@ -1215,3 +1215,168 @@ jobinfo
 ```
 
 [REPORT ON FIRST CONTIG-DB](./reports/pangenomics/Contigs%20DB%20Stats.pdf)
+
+# Day 8 Transcriptomics
+
+- READemption RNA-seq pipeline (proxy on backend needed for internet connection), reademption create: set up folder structure of project, afterwards downloading of input data from published files, all steps combined in the pipeline (see script), gene quantification command needs exact order of sample names
+- 3 file types: .fastq (reads), genome.fasta (sequence), genome.gff (annotation)
+
+
+## Workflow READemption pipeline
+
+*NOTES:*
+
+- script should be in same directory as READemption project directory, for the correct paths
+- reademtion in terminal to check first
+- search for accession numbers in published papers to find uploaded sequence data, samples, open single samples on link to see more details on organsism and sequence (META data to the samples); SRA/SRX file download either .fastq or .zip (downloaded files will be saved with SRX/SRR name, SRP shows whole project)
+- auto download of SRR files with grabseqs in terminal
+- downloaded files into input/reads directory (createt with READemption create and specific project name)
+- quality control by fastqc before is poosible
+
+---
+
+Salmonella example:
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --time=0-04:00:00
+#SBATCH --job-name=reademption_tutorial
+#SBATCH --output=reademption_tutorial.out
+#SBATCH --error=reademption_tutorial.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+
+#set proxy environment to download the data and use the internet in the backend
+export http_proxy=http://relay:3128
+export https_proxy=http://relay:3128
+export ftp_proxy=http://relay:3128
+
+conda activate reademption
+# create folders
+reademption create --project_path READemption_analysis --species salmonella="Salmonella Typhimurium"
+
+# Download the files
+FTP_SOURCE=ftp://ftp.ncbi.nih.gov/genomes/archive/old_refseq/Bacteria/Salmonella_enterica_serovar_Typhimurium_SL1344_uid86645/
+wget -O READemption_analysis/input/salmonella_reference_sequences/NC_016810.fa $FTP_SOURCE/NC_016810.fna
+wget -O READemption_analysis/input/salmonella_reference_sequences/NC_017718.fa $FTP_SOURCE/NC_017718.fna
+wget -O READemption_analysis/input/salmonella_reference_sequences/NC_017719.fa $FTP_SOURCE/NC_017719.fna
+wget -O READemption_analysis/input/salmonella_reference_sequences/NC_017720.fa $FTP_SOURCE/NC_017720.fna
+
+#rename the files similar to the genome naming
+sed -i "s/>/>NC_016810.1 /" READemption_analysis/input/salmonella_reference_sequences/NC_016810.fa
+sed -i "s/>/>NC_017718.1 /" READemption_analysis/input/salmonella_reference_sequences/NC_017718.fa
+sed -i "s/>/>NC_017719.1 /" READemption_analysis/input/salmonella_reference_sequences/NC_017719.fa
+sed -i "s/>/>NC_017720.1 /" READemption_analysis/input/salmonella_reference_sequences/NC_017720.fa
+wget -P READemption_analysis/input/salmonella_annotations https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/210/855/GCF_000210855.2_ASM21085v2/GCF_000210855.2_ASM21085v2_genomic.gff.gz
+
+# unzip the file
+gunzip READemption_analysis/input/salmonella_annotations/GCF_000210855.2_ASM21085v2_genomic.gff.gz
+wget -P READemption_analysis/input/reads http://reademptiondata.imib-zinf.net/InSPI2_R1.fa.bz2
+wget -P READemption_analysis/input/reads http://reademptiondata.imib-zinf.net/InSPI2_R2.fa.bz2
+wget -P READemption_analysis/input/reads http://reademptiondata.imib-zinf.net/LSP_R1.fa.bz2
+wget -P READemption_analysis/input/reads http://reademptiondata.imib-zinf.net/LSP_R2.fa.bz2
+
+#read alignment
+reademption align -p 4 --poly_a_clipping --project_path READemption_analysis
+
+# read coverage
+reademption coverage -p 4 --project_path READemption_analysis
+
+# gene quantification
+reademption gene_quanti -p 4 --features CDS,tRNA,rRNA --project_path READemption_analysis
+reademption deseq -l InSPI2_R1.fa.bz2,InSPI2_R2.fa.bz2,LSP_R1.fa.bz2,LSP_R2.fa.bz2 -c InSPI2,InSPI2,LSP,LSP -r 1,2,1,2 --libs_by_species salmonella=InSPI2_R1,InSPI2_R2,LSP_R1,LSP_R2 --project_path READemption_analysis
+
+# visualzation
+reademption viz_align --project_path READemption_analysis
+reademption viz_gene_quanti --project_path READemption_analysis
+reademption viz_deseq --project_path READemption_analysis
+conda deactivate
+module purge
+jobinfo
+```
+
+Prasse et al. 2017 (Methanosarcina mazei) data:
+ 1. Download .fastq.gz from database webpage (different SRR numbers), grapseqs would also be possible. Also download the reference sequence of the strain from NCBI!!
+
+ 2. Quality control by **fastqc**:
+ ```bash
+ #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --time=0-04:00:00
+#SBATCH --job-name=qc
+#SBATCH --output=qc.out
+#SBATCH --error=qc.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+modlue load micromamba
+micromamba activate 01_short_reads_qc
+
+mkdir $WORK/RNAseq/publication_Prasse/fastqc/qc_reports
+
+for i in $WORK/RNAseq/publication_Prasse/fastqc/*.fastq.gz; do fastqc -t 4 -o $WORK/RNAseq/publication_Prasse/fastqc/qc_reports $i; done
+
+micromamba deactivate
+module purge
+jobinfo
+ ```
+
+ 3. cleaning by **fastp**:
+
+ ```bash
+ #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --time=0-04:00:00
+#SBATCH --job-name=qc_clean
+#SBATCH --output=qc_clean.out
+#SBATCH --error=qc_clean.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load gcc12-env/12.1.0
+module load micromamba
+micromamba activate 01_short_reads_qc
+
+for i in $WORK/RNAseq/publication_Prasse/fastqc/*.fastq.gz; do fastp -i $i -o ${i}_cleaned.fastq.gz -h ${i}_fastp.html -j ${i}_fastp.json -w 4 -q 20 -z 4; done
+
+
+micromamba deactivate
+module purge
+jobinfo
+ ```
+
+ 4. Quality control of cleaned reads by **fastqc**:
+ ```bash
+ #BASH SCRIPT 
+
+ for i in $WORK/RNAseq/publication_Prasse/fastqc/fastp/*.fastq.gz; do fastqc -t 4 -o $WORK/RNAseq/publication_Prasse/fastqc/qc_clean_reports $i; done
+ ```
+
+OUTPUT: the quality **did not improve!!** so the raw read quality is used fro the READemption pipeline, as the quality is good!
+
+4. READemption initialization:
+
+```bash
+#IN TERMINAL
+
+reademption create --project_path READemption_analysis --species methanosarcina="Methanosarcina mazei"
+```
+
+--> raw_reads and reference sequence into the folders manually
+
+5. READemption pipeline script:
+
+```bash
+
+```
