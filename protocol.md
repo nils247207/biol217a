@@ -1134,50 +1134,73 @@ cd $WORK/pangenomics/03_random_genomes
 
 #IN TERMINAL ONLY!! ls *fasta > genomes.txt
 # remove all contigs <2500 nt
-# for g in `cat genomes.txt`
-# do
-#     echo
-#     echo "Working on $g ..."
-#     echo
-#     anvi-script-reformat-fasta ${g}.fasta \
-#                                --min-len 2500 \
-#                                --simplify-names \
-#                                -o ${g}_2.5K.fasta
-# done
+for g in `cat genomes.txt`
+do
+    echo
+    echo "Working on $g ..."
+    echo
+    anvi-script-reformat-fasta ${g}.fasta \
+                               --min-len 2500 \
+                               --simplify-names \
+                               -o ${g}_2.5K.fasta
+done
 
-# # generate contigs.db
-# for g in `cat genomes.txt`
-# do
-#     echo
-#     echo "Working on $g ..."
-#     echo
-#     anvi-gen-contigs-database -f ${g}_2.5K.fasta \
-#                               -o ${g}.db \
-#                               --num-threads 4 \
-#                               -n ${g}
-# done
+# generate contigs.db
+for g in `cat genomes.txt`
+do
+    echo
+    echo "Working on $g ..."
+    echo
+    anvi-gen-contigs-database -f ${g}_2.5K.fasta \
+                              -o ${g}.db \
+                              --num-threads 4 \
+                              -n ${g}
+done
 
-# # annotate contigs.db
-# for g in *.db
-# do
-#     anvi-run-hmms -c $g --num-threads 4
-#     anvi-run-ncbi-cogs -c $g --num-threads 4
-#     anvi-scan-trnas -c $g --num-threads 4
-#     anvi-run-scg-taxonomy -c $g --num-threads 4
-# done
+# annotate contigs.db
+for g in *.db
+do
+    anvi-run-hmms -c $g --num-threads 4
+    anvi-run-ncbi-cogs -c $g --num-threads 4
+    anvi-scan-trnas -c $g --num-threads 4
+    anvi-run-scg-taxonomy -c $g --num-threads 4
+done
 
 #-------------------------------------------------
+```
 
-# anvi-script-gen-genomes-file --input-dir $WORK/pangenomics/03_random_genomes \
-#                              -o external-genomes.txt
+[REPORT ON FIRST CONTIG-DB](./reports/pangenomics/Contigs%20DB%20Stats.pdf)
 
 
 
+```bash
+# 5. create external genomes file
+anvi-script-gen-genomes-file --input-dir $WORK/pangenomics/03_random_genomes \
+                              -o external-genomes.txt
+
+
+```
+
+Investigate conatmination 
+```bash
+#TERMINAL
+
+anvi-estimate-genome-completeness -e external-genomes.txt
+```
+
+![03_random_genomes_completeness](./images/pangenomics/03_random_genome_completeness_terminal_output.png)
+
+
+Visualization for refinement:
+
+- first profiling:
+
+```bash
 # 7.
-# anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
-#              --sample-name V_jascida_52 \
-#              --output-dir $WORK/anvio_results/V_jascida_genomes/V_jascida_52 \
-#              --blank
+anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
+              --sample-name V_jascida_52 \
+              --output-dir $WORK/anvio_results/V_jascida_genomes/V_jascida_52 \
+              --blank
 
 #8.
 
@@ -1214,18 +1237,20 @@ jobinfo
 
 ```
 
-[REPORT ON FIRST CONTIG-DB](./reports/pangenomics/Contigs%20DB%20Stats.pdf)
+
 
 # Day 8 Transcriptomics
 
-- READemption RNA-seq pipeline (proxy on backend needed for internet connection), reademption create: set up folder structure of project, afterwards downloading of input data from published files, all steps combined in the pipeline (see script), gene quantification command needs exact order of sample names
-- 3 file types: .fastq (reads), genome.fasta (sequence), genome.gff (annotation)
+- Transcriptomics is used to analyse which genes are expressed, how much they are expressed and how different they are expressed compaired under different conditions
+- fold changes in RNA expression allows insight on mechanism undderlying responds
 
 
 ## Workflow READemption pipeline
 
 *NOTES:*
 
+- READemption RNA-seq pipeline (proxy on backend needed for internet connection), reademption create: set up folder structure of project, afterwards downloading of input data from published files, all steps combined in the pipeline (see script), gene quantification command needs exact order of sample names
+- 3 file types: .fastq (reads), genome.fasta (sequence), genome.gff (annotation)
 - script should be in same directory as READemption project directory, for the correct paths
 - reademtion in terminal to check first
 - search for accession numbers in published papers to find uploaded sequence data, samples, open single samples on link to see more details on organsism and sequence (META data to the samples); SRA/SRX file download either .fastq or .zip (downloaded files will be saved with SRX/SRR name, SRP shows whole project)
@@ -1235,7 +1260,7 @@ jobinfo
 
 ---
 
-Salmonella example:
+### Salmonella example:
 
 ```bash
 #!/bin/bash
@@ -1301,8 +1326,12 @@ module purge
 jobinfo
 ```
 
-Prasse et al. 2017 (Methanosarcina mazei) data:
- 1. Download .fastq.gz from database webpage (different SRR numbers), grapseqs would also be possible. Also download the reference sequence of the strain from NCBI!!
+[Vulcano Plot Output](./reports/RNA-seq/volcano_plots_log2_fold_change_vs_adjusted_p-value.pdf)
+
+---
+
+### Prasse et al. 2017 (Methanosarcina mazei) data:
+ 1. Download .fastq.gz from database webpage (different SRR numbers), grapseqs would also be possible. Also download the reference sequence (.fa) and annotation (.gff) of the strain from NCBI!!
 
  2. Quality control by **fastqc**:
  ```bash
@@ -1363,9 +1392,9 @@ jobinfo
  for i in $WORK/RNAseq/publication_Prasse/fastqc/fastp/*.fastq.gz; do fastqc -t 4 -o $WORK/RNAseq/publication_Prasse/fastqc/qc_clean_reports $i; done
  ```
 
-OUTPUT: the quality **did not improve!!** so the raw read quality is used fro the READemption pipeline, as the quality is good!
+OUTPUT: the quality **did not improve!!** so the raw read quality is used for the READemption pipeline!
 
-4. READemption initialization:
+5. READemption initialization:
 
 ```bash
 #IN TERMINAL
@@ -1373,10 +1402,52 @@ OUTPUT: the quality **did not improve!!** so the raw read quality is used fro th
 reademption create --project_path READemption_analysis --species methanosarcina="Methanosarcina mazei"
 ```
 
---> raw_reads and reference sequence into the folders manually
+The downloaded raw reads and reference sequence/annotation have to be moved into the created folders manually. The read files (.fastq.gz) have to be named in a clear way with the numbers 1 or 2 at the end for comparison of the versions.
 
-5. READemption pipeline script:
+6. READemption pipeline script:
 
 ```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --time=0-04:00:00
+#SBATCH --job-name=reademption_prasse
+#SBATCH --output=reademption_prasse.out
+#SBATCH --error=reademption_prasse.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
 
+module load gcc12-env/12.1.0
+module load miniconda3/4.12.0
+
+#set proxy environment to download the data and use the internet in the backend
+export http_proxy=http://relay:3128
+export https_proxy=http://relay:3128
+export ftp_proxy=http://relay:3128
+
+conda activate reademption
+# create folders
+#reademption create --project_path READemption_analysis --species methanosarcina="Methanosarcina mazei"
+
+
+#read alignment
+reademption align -p 4 --poly_a_clipping --project_path READemption_analysis
+
+# read coverage
+reademption coverage -p 4 --project_path READemption_analysis
+
+# gene quantification (CORRECT ORDER OF FILE NAMES!!!)
+reademption gene_quanti -p 4 --features CDS,tRNA,rRNA --project_path READemption_analysis
+reademption deseq -l wt_1.fastq.gz,wt_2.fastq.gz,del_mutant_1.fastq.gz,del_mutant_2.fastq.gz -c wt,wt,del_mutant,del_mutant -r 1,2,1,2 --libs_by_species methanosarcina=wt_1,wt_2,del_mutant_1,del_mutant_2 --project_path READemption_analysis
+
+# visualzation
+reademption viz_align --project_path READemption_analysis
+reademption viz_gene_quanti --project_path READemption_analysis
+reademption viz_deseq --project_path READemption_analysis
+
+conda deactivate
+module purge
+jobinfo
 ```
+
