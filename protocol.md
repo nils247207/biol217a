@@ -1197,38 +1197,34 @@ Visualization for refinement:
 
 ```bash
 # 7.
-anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
-              --sample-name V_jascida_52 \
-              --output-dir $WORK/anvio_results/V_jascida_genomes/V_jascida_52 \
-              --blank
+cd $WORK/pangenomics/03_random_genomes
+for i in *.db; do anvi-profile -c "$i" \
+              --sample-name "i" \
+              --output-dir ./profiling_output”$i” \
+              --blank; done
 
-#8.
+```
 
-# cd $WORK/anvio_results/V_jascida_genomes
+```bash
+#TERMINAL
 
-# anvi-split -p V_jascida_52/PROFILE.db \
-#            -c V_jascida_52.db \
-#            -C default \
-#            -o V_jascida_52_SPLIT --force-overwrite
+module load micromamba
+micromamba activate anvio-8
 
-# Here are the files you created
-#V_jascida_52_SPLIT/V_jascida_52_CLEAN/CONTIGS.db
+anvi-interactive -c genome...db \
+                 -p genome.../PROFILE.db
+```
+--> genomes look good and do not have to split, because of bad quality bins
 
-#sed 's/V_jascida_52.db/V_jascida_52_SPLIT\/V_jascida_52_CLEAN\/CONTIGS.db/g' external-genomes.txt > external-genomes-final.txt
-
-#9.
-
-# anvi-estimate-genome-completeness -e external-genomes.txt
-# anvi-estimate-genome-completeness -e external-genomes-final.txt
-
+```bash
 #10.
 
-# anvi-gen-genomes-storage -e external-genomes-final.txt \
-#                          -o V_jascida-GENOMES.db
+anvi-gen-genomes-storage -e external-genomes.txt \
+                         -o ALL-GENOMES.db
 
-# anvi-pan-genome -g V_jascida-GENOMES.db \
-#                 --project-name V_jascida \
-#                 --num-threads 4
+anvi-pan-genome -g ALL-GENOMES.db \
+                --project-name 03_random_genomes \
+                --num-threads 4
 
 
 micromamba deactivate
