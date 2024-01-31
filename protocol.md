@@ -1109,3 +1109,109 @@ anvi-pan-genome -g V_jascida-GENOMES.db \
                 --project-name V_jascida \
                 --num-threads 4
 ```
+
+### Own Pangenomics on 10 random bacteria genomes:
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=5:00:00
+#SBATCH --job-name=anvio_pangenomics
+#SBATCH --output=anvio_pangenomics.out
+#SBATCH --error=anvio_pangenomics.err
+#SBATCH --partition=base
+#SBATCH --reservation=biol217
+
+module load micromamba
+micromamba activate anvio-8
+
+cd $WORK/pangenomics/03_random_genomes
+
+#----------------
+3.
+
+#IN TERMINAL ONLY!! ls *fasta > genomes.txt
+# remove all contigs <2500 nt
+# for g in `cat genomes.txt`
+# do
+#     echo
+#     echo "Working on $g ..."
+#     echo
+#     anvi-script-reformat-fasta ${g}.fasta \
+#                                --min-len 2500 \
+#                                --simplify-names \
+#                                -o ${g}_2.5K.fasta
+# done
+
+# # generate contigs.db
+# for g in `cat genomes.txt`
+# do
+#     echo
+#     echo "Working on $g ..."
+#     echo
+#     anvi-gen-contigs-database -f ${g}_2.5K.fasta \
+#                               -o ${g}.db \
+#                               --num-threads 4 \
+#                               -n ${g}
+# done
+
+# # annotate contigs.db
+# for g in *.db
+# do
+#     anvi-run-hmms -c $g --num-threads 4
+#     anvi-run-ncbi-cogs -c $g --num-threads 4
+#     anvi-scan-trnas -c $g --num-threads 4
+#     anvi-run-scg-taxonomy -c $g --num-threads 4
+# done
+
+#-------------------------------------------------
+
+# anvi-script-gen-genomes-file --input-dir $WORK/pangenomics/03_random_genomes \
+#                              -o external-genomes.txt
+
+
+
+# 7.
+# anvi-profile -c $WORK/anvio_results/V_jascida_genomes/V_jascida_52.db \
+#              --sample-name V_jascida_52 \
+#              --output-dir $WORK/anvio_results/V_jascida_genomes/V_jascida_52 \
+#              --blank
+
+#8.
+
+# cd $WORK/anvio_results/V_jascida_genomes
+
+# anvi-split -p V_jascida_52/PROFILE.db \
+#            -c V_jascida_52.db \
+#            -C default \
+#            -o V_jascida_52_SPLIT --force-overwrite
+
+# Here are the files you created
+#V_jascida_52_SPLIT/V_jascida_52_CLEAN/CONTIGS.db
+
+#sed 's/V_jascida_52.db/V_jascida_52_SPLIT\/V_jascida_52_CLEAN\/CONTIGS.db/g' external-genomes.txt > external-genomes-final.txt
+
+#9.
+
+# anvi-estimate-genome-completeness -e external-genomes.txt
+# anvi-estimate-genome-completeness -e external-genomes-final.txt
+
+#10.
+
+# anvi-gen-genomes-storage -e external-genomes-final.txt \
+#                          -o V_jascida-GENOMES.db
+
+# anvi-pan-genome -g V_jascida-GENOMES.db \
+#                 --project-name V_jascida \
+#                 --num-threads 4
+
+
+micromamba deactivate
+module purge
+jobinfo
+
+```
+
+[REPORT ON FIRST CONTIG-DB](./reports/pangenomics/Contigs%20DB%20Stats.pdf)
