@@ -2,19 +2,10 @@
 
 # Day 1: Introduction to Linux, Markdown, Git and Conda
 
-### 1 Linux
-
-What we have learned so far:
-
-1. Basic Linux
+1. Linux commands and login into CAU cluster via SSH
 2. Bioinformatic basics
-3. Linux commands
+3. Setting up a Git repository
 
-- copy from one folder to another:
-
-```sh
-cp source destination
-```
 
 # Day 2: Introduction to Metagenomics and Metagenomic Workflow
 
@@ -24,6 +15,8 @@ cp source destination
 
 Only a small percentage of the global microbial diversity can be cultured in the lab. In order to study microbes in their natural environment, metagenomic analysis can be used. By sequencing of the genomic DNA, plasmids or transcriptomes it is possible to investigate the microbial diversity.
 
+---
+*NOTES:*
 
 - Limitations: only proportions, not absolut values of microbes in the environment (see slide 16)
 
@@ -49,6 +42,8 @@ Assembly:
 - refernce-guided: known sequences from reference
 - de-novo: overlap or de Bruijn
 - k-mer: nr of nucleotides looked at at once
+
+---
 
 ## Assembly of Short Read Sequences on the CAU Cluster (Workflow)
 
@@ -177,19 +172,20 @@ megahit -1 [R1 FILE] -1 [R1 FILE] -1 [R1 FILE] -2 [R2 FILE] -2 [R2 FILE] -2 [R2 
 
 # Day 3: From Contigs to Bins (Binning)
 
+*NOTES:*
+
 - Contigs: proportion of contigs do not mirror reality, inrormation from sequncing data needed
 - k-mer of 4 best for computing
-- sequnce composition into MAGs ???
 - back mapping of all short reads to the reulting contig (by fastp) gives different coverages, usually ca 7 --> all contigs from one species should have similiar coverage
 - Binning on slide 143 (basis GC-content, kmer composition, covarage for most programs)
-
 - quality control (QC) of MAGs: marker genes (SCGs), genomic characteristics on slide 146
 - 16S RNA data hard to resolve in MAGs
 - Minimum information about MAG standards (MIMAG) to compare MAG qualities
 - MAG: collection of many strains (NOT a single strain!!) 
 - SNP analysis in the coverage: same SNPs are hint for same strain, different indicate strain divergence
 - slide 151: fragmentation can be indicated by high number of contigs needed for one MAG
-- 
+
+---
 
 ## Workflow Quality Assessment of Assemblies
 
@@ -324,7 +320,7 @@ ssh -L 8080:localhost:8080 n###
 ```
 The link http://127.0.0.1:8060 or http://127.0.0.1:8080 can be opened in the browser om the local PC! The program shows the stats of the database file (.db):
 
-[Database report](./reports/contig_database/Contigs%20DB%20Stats.pdf)
+[Database report](./reports/metagenomics/contig_database/Contigs_DB_Stats.pdf)
 
 ## Workflow Binning with ANVI´O
 
@@ -435,28 +431,28 @@ BINSANITY result contains 150 bins:
 
 # Day 4:
 
-Lecture: 
+*NOTES:*
 
 - Contamination in MAGs (MAG is a group of genomes from several species!!): by different genomes in one bin
-- **single copy marker genes???** 
 - solution: run different binners, compared in a bin REFINER
 - solution: reuse (all reads an not just high abundance reads used in mapping) raw reads for mapping on original bins, which can give more information on the overlapping of contigs in one bin, ...
 - chimera detection in MAGs: GUNC scoring (can resolve non-redundant combination of genes from different taxa in one bin) of CSS (based on taxonomic diversity in one contig compared to the other contiigs diversities): high RRS gives confidence based on reference database
 - **completeness and contamination** (quality measures are completness % values)
-
 - bin refinment: chimera detection (gene information compared to database), multiple binning, use raw reads and infos from .fastq
-
 - MAG taxonomy (slide 173)
 
+---
 
 
-# Day 5:
+# Day 5: Bin Refinement and Taxonomy
 
-Lecture:
+*NOTES:*
 
 - repition to integrated artifacts (virus, etc) : different nucleotide composition (e.g. GC content, tetranucleotide frequency)
 - shotgun sequencing: 
-#### TAXONOMY: (slide to present day approaches) 
+
+TAXONOMY: (slide to present day approaches) 
+
 - Phylogenomics uses howl genome datasets
 - limitations if only based on 1 gene (eg 16S rRNA)
 - Genome Taxonomy DataBase (average nucleotide identity and evolutionary divergence) holds many genomes, which are not cultivated. BUT lot of work to be done to avaluate MAG based data further
@@ -464,17 +460,17 @@ Lecture:
 - GTDB taxonomy assignemt output on slide 190, some species must be assigned even though they cannot be cultivated, different names between databases possible
 - other databases: son slide ~195, JSpeciesW for comparison bewteen databases?
 
-#### MAG 
+MAG 
+
 - dereplication on slide 198
 - abundance comparison between samples of the same environment possible by coverage values (ONLY RELATIVE VALUES): read recruitment (is there a best sequencing technique for comparible coverage values??)
 - contigs/reads not used for final MAG binning: information used for profiling afterwards --> taxonomy slide 258 ff. Lowest common ancestor which shares a givin sequence- What other organisms might be present in a sample and could not be included in a MAG
-- 
 
 ## Workflow Bin Refinement (only Archaea)
 
-### 1. Identifieng the Archaea strain bins from the binning results respectively. Then copy the single bin directories into an extra directory with all bins selected for refinement.
+1. Identifieng the Archaea strain bins from the binning results respectively. Then copy the single bin directories into an extra directory with all bins selected for refinement.
 
-### 2. Detection of chimerism and contamination by **GUNC**, which might result from mis-binning of genomic contigs from unrelated lineages. Therefore the output from seperate binners are used (in this script a different node and high memory is used for faster computation):
+2. Detection of chimerism and contamination by **GUNC**, which might result from mis-binning of genomic contigs from unrelated lineages. Therefore the output from seperate binners are used (in this script a different node and high memory is used for faster computation):
 
 ```bash
 #!/bin/bash
@@ -505,10 +501,13 @@ for i in *.fa; do gunc run -i "$i" -r /work_beegfs/sunam230/Databases/gunc_db_pr
 gunc plot -d ./diamond_output/METABAT__39-contigs.diamond.progenomes_2.1.out -g ./gene_calls/gene_counts.json
 ```
 
-Example visualization of a Archaeau METABAT bin:
-![GUNC_refined_bin_Archaea_METABAT_39](./images/GUNC_visual_METABAT_bin_39_archaea.png)
+Example visualization of an Archeae METABAT bin:
 
-### 3. Manual bin refinement with **anvi-refine**. The unrefinded bin will be OVERWRITTEN by this program, so the unrefindes bin need du be copied as backup. Then:
+![GUNC_refined_bin_Archaea_METABAT_39](./images/metagenomics/GUNC_visual_METABAT_bin_39_archaea.png)
+
+### 3. Manual bin refinement with **anvi-refine**:
+
+The unrefinded bin will be OVERWRITTEN by this program, so the unrefindes bin need du be copied as backup. Then:
 
 ```bash
 #TERMINAL
@@ -524,7 +523,7 @@ The contigs included in this MAG are shown for all different samples (BGR)
 ![anvio-interactive-manual-fefinemt-METABAT_39](./images/metagenomics/anvio-interactive-manual-refiement-METABAT_39.png)
 
 
-Different GC content is a first indicator for the integration of wrong genomes into the bin. Also the ebove
+Different GC content and contig length is a first indicator for the integration of wrong genomes into the bin. Also the ebove image shows how differently the samples contribute to a given contig in the final MAG. This can also help to identify conaminations.
 
 *questions from script...*
 
