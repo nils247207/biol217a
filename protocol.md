@@ -1482,3 +1482,61 @@ Visualization of MM_RS00065 annotation in IGB, mapped to th RNA-seq data to conf
 Visualization of MM_RS00065 annotation in IGB, mapped to th RNA-seq data to confirm the upregultation from the table:
 
 ![RNA-seq_BGI_2](./images/RNA-seq/RNA-seq_IGB_2.png)
+
+
+# Ribosome Profiling/Ribo-seq (Translatomics)
+
+- used to find new proteins (see limitations of proteomics in slide) na improve genome annotations
+- small proteins 50-100 AA (303bp) can be identified better
+- sensitive/high resolution can generate many false results
+- annotation independent, but better with an annotated genome
+- power: monitor translation *in vivo*
+- snapshot of all active ribosomes 
+- shows mRNA which is actually translated in contrast to transcriptomics only
+- new start codons and thereby new genes can be identified
+- reference genome sequence needed
+- used in addition to annotation and RNA-seq
+- biological insights on slide
+- translation efficiency between transcript and actual trancribed transcript
+- distinction between coding and NON-coding RNA
+- confirmation by other omics thechnique and lab experimetns necassary
+
+### Pipeline in slide!
+
+- deltate/riborex/xtrail compute fold changes (and p ADJUSTED values) between samples, also translational efficiency, also all stats for ORFs based on Ribo-prof.
+
+- deepribo (AI)/reparation compute ORFs together with .gff annotations to directly visualize the new annotations
+
+### Workflow and Analysis in slides!
+
+
+![rpoS_ribo_profiling](./images/Ribo-profiling/ribo-profiling1.png)
+
+The true translation (yellow) start of *rpoS* can be identified in comparison to the whole transcript (orange). Also differnt fold changes in translation can be observed. At start codon a higher signal is observed. Regulatory 5´UTR is common in procaryotes. Posttranscriptional differences could also be observed, if translation rate is higher than transcriptome. 
+BUT mis-alignments could always be possible. To prevent this high quality reads are necassery.
+
+---
+
+![rpoS_ribo_profiling2](./images/Ribo-profiling/ribo-profile-3.png)
+
+Environment of *spoR*. BUT the scales of forward and reverse alignment are different and can not be compared directly.
+
+---
+
+![scrA_ribo_profiling](./images/Ribo-profiling/Ribo-profiling4.png)
+
+
+- Start codon: ATG
+- Stop codon: TAA
+- length of ORF: 61
+- SD ribosomal binding site: 
+- name of upstream gene: STM14_3413
+- is *csrA* translated? : yes
+
+---
+
+![gene prediction by deepribp](./images/Ribo-profiling/robo_profiling6.png)
+
+Deepribo predicts not annotated genes on the reverse strand. The transcript is translated at a very low rate, despite the high transcript concentration.
+
+---

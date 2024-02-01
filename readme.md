@@ -16,3 +16,4 @@ Protocol progress:
 - pacbio video on yt
 - bandage/IGB in protocol and citation
 - answer all questions
+- random pangenome
