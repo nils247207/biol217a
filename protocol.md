@@ -1428,13 +1428,21 @@ conda activate reademption
 
 
 #read alignment
-reademption align -p 4 --poly_a_clipping --project_path READemption_analysis
+reademption align --project_path READemption_analysis \
+	--processes 32 --segemehl_accuracy 95 \
+	--poly_a_clipping \
+	--fastq --min_phred_score 25 \
+	--progress
 
 # read coverage
-reademption coverage -p 4 --project_path READemption_analysis
+reademption coverage --project_path READemption_analysis \
+	--processes 32
 
-# gene quantification (CORRECT ORDER OF FILE NAMES!!!)
-reademption gene_quanti -p 4 --features CDS,tRNA,rRNA --project_path READemption_analysis
+# gene quantification (how many reads mapped to the gene, each lib in output means each sample)
+reademption gene_quanti --project_path READemption_analysis \
+	--processes 32 --features CDS,tRNA,rRNA
+
+# also outputs .R script (computes fold changes)
 reademption deseq -l wt_1.fastq.gz,wt_2.fastq.gz,del_mutant_1.fastq.gz,del_mutant_2.fastq.gz -c wt,wt,del_mutant,del_mutant -r 1,2,1,2 --libs_by_species methanosarcina=wt_1,wt_2,del_mutant_1,del_mutant_2 --project_path READemption_analysis
 
 # visualzation
@@ -1447,3 +1455,30 @@ module purge
 jobinfo
 ```
 
+*Notes*:
+
+- order of output plots can be checked in deseq_with_annotations .csv files  together with all attributes to the specific genes
+- gene_wise_quantifications_combined_rpkm.csv shows absolute gene quantifications
+- many genes in output need further investigations, good for first hypotheses
+- deseq_with_annotations files can be used in RStudio
+- min_normalized output can be mapped against genome reference sequence and annotation
+
+---
+
+*Questions:*
+
+- what is tnoar?
+
+---
+
+
+- 5 upregulated genes in mutants:  MM_RS00065; MM_RS00075; MM_RS000405; MM_RS19070; MM_RS18170
+- 5 downregulated genes in mutants: MM_RS00785; MM_RS00910; MM_RS00120; MM_RS01055; MM_RS01450
+
+Visualization of MM_RS00065 annotation in IGB, mapped to th RNA-seq data to confirm the upregultation from the table:
+
+![RNA-seq_BGI_1](./images/RNA-seq/IGB_transcriptomics1.png)
+
+Visualization of MM_RS00065 annotation in IGB, mapped to th RNA-seq data to confirm the upregultation from the table:
+
+![RNA-seq_BGI_2](./images/RNA-seq/RNA-seq_IGB_2.png)

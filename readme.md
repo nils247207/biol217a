@@ -15,3 +15,4 @@ Protocol progress:
 - add versions of all programs
 - pacbio video on yt
 - bandage/IGB in protocol and citation
+- answer all questions
