@@ -1216,8 +1216,10 @@ anvi-interactive -c genome...db \
 ```
 --> genomes look good and do not have to split, because of bad quality bins
 
+Compute pangenome:
+
 ```bash
-#10.
+#10. compute pangenome
 
 anvi-gen-genomes-storage -e external-genomes.txt \
                          -o ALL-GENOMES.db
@@ -1230,7 +1232,52 @@ anvi-pan-genome -g ALL-GENOMES.db \
 micromamba deactivate
 module purge
 jobinfo
+```
 
+Compute phylogenomics of pangenome:
+```bash
+anvi-compute-genome-similarity -e external-genomes.txt \
+                 -o ANI \
+                 -p ./randomgenomes/random_genomes-PAN.db \
+                 -T 12
+
+anvi-get-sequences-for-gene-clusters -p ./random_genomes/random_genomes-PAN.db \
+                                     -g ALL-GENOMES.db \
+                                     --min-num-genomes-gene-cluster-occurs 31 \
+                                     --max-num-genes-from-each-genome 1 \
+                                     --concatenate-gene-clusters \
+                                     --output-file random_genomes/ALL-SCGs.fa
+
+trimal -in ./random_genomes/ALL-SCGs.fa \
+       -out random_genomes/ALL-SCGs-trimmed.fa \
+       -gt 0.5 
+
+iqtree -s ./random_genomes/ALL-SCGs-trimmed.fa \
+       -m WAG \
+       -bb 1000 \
+       -nt 8
+
+echo -e "item_name\tdata_type\tdata_value" \
+        > random_genomes/ALL-phylogenomic-layer-order.txt
+
+# add the newick tree as an order
+echo -e "SCGs_Bayesian_Tree\tnewick\t`cat PROCHLORO/Prochlorococcus-SCGs-trimmed.fa.treefile`" \
+        >> random_genomes/ALL-phylogenomic-layer-order.txt
+
+# import the layers order file
+anvi-import-misc-data -p ./random_genomes/random_genomes-PAN.db \
+                      -t random_genomes/ALL-phylogenomic-layer-order.txt
+```
+
+
+Display pangenome with anvi-interactive:
+```bash
+#TERMINAL
+module load micromamba
+micromamba activate anvio-8
+
+#PAN.db and GENOMES.db as input
+anvi-display-pan -p ./random_genomes/random_genomes-PAN.db -g ALL-GENOMES.db
 ```
 
 
@@ -1240,8 +1287,24 @@ jobinfo
 - Transcriptomics is used to analyse which genes are expressed, how much they are expressed and how different they are expressed compaired under different conditions
 - fold changes in RNA expression allows insight on mechanism undderlying responds
 
+![values](./concepts_and_overviews/transcriptomics_values.png)
+
+
+### Tools
+| Tool        | Version | Repository                                                                        |
+|-------------|---------|-----------------------------------------------------------------------------------|
+| READemption |  2.0.3  | [link](https://reademption.readthedocs.io/en/latest/) |
+| DESeq2      |   4.2   | [link](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) |
+| edgeR       |   3.32  | [link](https://bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf) |
+| limma       |   3.46  | [link](https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf) |
+| R           |   4.1.0 | [link](https://cran.r-project.org/) |
+| RStudio     |   1.4.1717 | [link](https://rstudio.com/) |
+| Kallisto    |   0.48.0 |  [link](https://github.com/pachterlab/kallisto)
+
 
 ## Workflow READemption pipeline
+
+![READemption_pipeline](./concepts_and_overviews/READemption_pipeline.png)
 
 *NOTES:*
 
@@ -1454,6 +1517,8 @@ conda deactivate
 module purge
 jobinfo
 ```
+
+---
 
 *Notes*:
 
