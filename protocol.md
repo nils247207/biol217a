@@ -1607,6 +1607,8 @@ Deepribo predicts not annotated genes on the reverse strand. The transcript is t
 
 # Day 10 Experimental Design
 
+**CLEAR research question question from the beginning**
+
 *NOTES:*
 
 - different sequence approaches for different omics analysis (in slide)
@@ -1633,4 +1635,15 @@ Lab considerations:
 - negative controls 
 - tradeof between quality and purifications steps/costs/tests
 - RNA quality: RNA Integrity Number (RIN), 95% is rRNA!, so RNA depletion/enrichment depends on analyis
+- technical (same sampling process) and biological (different samples) replicates
+- co-assembly necassary or not, depends on question and samples
+
+---
+
+Experimantal design considerations on slide.
+
+- more replicates give more output for less money than deeper sequencing
+- normalization of sequences by mock communities when reconstructing MAGs
+- false discovery rates in RNA-seq?
+- x100 coverage for short reads, x50 coverage for long reads recommended for sequencing
 - 
