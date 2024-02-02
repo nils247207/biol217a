@@ -1548,7 +1548,7 @@ Visualization of MM_RS00065 annotation in IGB, mapped to th RNA-seq data to conf
 ![RNA-seq_BGI_2](./images/RNA-seq/RNA-seq_IGB_2.png)
 
 
-# Ribosome Profiling/Ribo-seq (Translatomics)
+# Day10 Ribosome Profiling/Ribo-seq (Translatomics)
 
 - used to find new proteins (see limitations of proteomics in slide) na improve genome annotations
 - small proteins 50-100 AA (303bp) can be identified better
@@ -1604,3 +1604,33 @@ Environment of *spoR*. BUT the scales of forward and reverse alignment are diffe
 Deepribo predicts not annotated genes on the reverse strand. The transcript is translated at a very low rate, despite the high transcript concentration.
 
 ---
+
+# Day 10 Experimental Design
+
+*NOTES:*
+
+- different sequence approaches for different omics analysis (in slide)
+- procaryote 16S marker gene has conserved and dynamic regions which alows to amplify the dynamic regions and observe difference evolutionary depths (but amplicon approach limited to the marker)
+- hybrid assembly gives best results in whole genome assembly so far (high accuracy of short reads combined with long read info on repeats, etc)
+- whole genome seq. is bases for transcriptomics
+- single cell genomics (uneven coverage and chimeric regions by amplifications)
+- transcriptomics: how to enrich only mRNA?, cDNA library necassery for sequencing, isoform expression?
+- combination of technologies nedded to get more reliable results on the true gene/protein expression
+- Illumina: sequencing by synthesis, DNA library bridge amp., DNA attaches to membrane, flurorescence labelled dNTP read out, 50-150bp (300bp?), single and paired end reading possible
+- Nanopore: motorprotein attached to DNA drags sDNA trough membrane pore, measurment of ion current applied to membrane, parallel anylsis of DNA modification, 10-100kb, medium accuracy
+- PacBio: hifi reads, SMRTbell librabries, multiple amp. of circulized library, medium-long reads, sequencing by binding, fluorescnce measurement, very high accuracy (phred > 40)
+- short read tech. allows parallel seq. and large number of samples, but PCR needed, lower quality DNA/RNA can be sequenced
+- use new pipelines and NEW databases for omic process
+- use standard measures (eg MIMAG)
+
+Lab considerations:
+
+- soil samples are hard to extract MAG from, because of remnants and salts
+- hard lysis also sheares DNA (trade-of to recover all DNA in a sample)
+- extraction methods dependant on sample type
+- consider not wanted DNA, eg human, which has to be removed as much as possible in lab (for whole genome seq) otherwise most of the sequenced data will be artifacts
+- immediate freezing during outdoor sampling
+- negative controls 
+- tradeof between quality and purifications steps/costs/tests
+- RNA quality: RNA Integrity Number (RIN), 95% is rRNA!, so RNA depletion/enrichment depends on analyis
+- 
