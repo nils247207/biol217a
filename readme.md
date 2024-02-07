@@ -1,7 +1,10 @@
 # README
 
 Course: biol217: Microbial Omics
+
 Nils Gröters
+
+---
 
 ## TODo
 
